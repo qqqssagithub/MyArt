@@ -1,0 +1,4 @@
+pod 'pop', '~> 1.0.8'
+pod 'AFNetworking', '~> 3.0.0-beta.2'
+pod 'SDWebImage', '~> 3.7.3'
+pod 'iCarousel', '~> 1.8.2'
