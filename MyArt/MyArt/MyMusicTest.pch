@@ -1,0 +1,51 @@
+//
+//  MyMusicTest.pch
+//  MyMusicTest
+//
+//  Created by qianfeng0 on 15/12/6.
+//  Copyright © 2015年 陈少文. All rights reserved.
+//
+
+#ifndef MyMusicTest_pch
+#define MyMusicTest_pch
+
+#import <UIKit/UIKit.h>
+#import <AVFoundation/AVFoundation.h>
+#import <MediaPlayer/MPNowPlayingInfoCenter.h>
+#import <MediaPlayer/MPMediaItem.h>
+#import <POP.h>
+#import <AFNetworking.h>
+#import <UIImageView+WebCache.h>
+#import <Accelerate/Accelerate.h>
+#import "NetDataEngine.h"
+#import "BaseModel.h"
+#import "BaseViewController.h"
+#import "ViewController.h"
+#import "CoreData+MagicalRecord.h"
+#import "JHRefresh.h"
+#import <iCarousel.h>
+#import "FXImageView.h"
+#import "KVNProgress.h"
+#import "SongModel.h"
+#import "PlayButtonView.h"
+#import "VolumeView.h"
+#import "RecommendedViewController.h"
+#import "SongViewController.h"
+#import "ListViewController.h"
+#import "RadioViewController.h"
+
+
+//屏幕尺寸定义
+#define SCREEN_WIDTH  [UIScreen mainScreen].bounds.size.width
+#define SCREEN_HEIGHT [UIScreen mainScreen].bounds.size.height
+#define SCREEN_SIZE   [UIScreen mainScreen].bounds.size
+#define SCREEN_RECT   [UIScreen mainScreen].bounds
+
+
+#define SONG_URL @"http://tingapi.ting.baidu.com/v1/restserver/ting?method=baidu.ting.song.getInfos&ts=1448284306&songid=%@%@"
+#define SONG_URL_X @"&nw=2&l2p=2897.5&lpb=193088&ext=MP3&format=json&from=ios&usup=1&lebo=0&aac=0&ucf=4&vid=&res=2&e=NOY9TnalK3sTHsDcDyNRBHqApG4ORk4vmKD8QrlAJ8Q%3D&version=5.5.1&from=ios&channel=appstore"
+
+// Include any system framework and library headers here that should be included in all compilation units.
+// You will also need to set the Prefix Header build setting of one or more of your targets to reference this file.
+
+#endif /* MyMusicTest_pch */

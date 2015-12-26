@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<model userDefinedModelVersionIdentifier="" type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="9057" systemVersion="14F27" minimumToolsVersion="Xcode 7.0">
+    <entity name="SongDetail" representedClassName="SongDetail" syncable="YES">
+        <attribute name="album_title" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="author" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="lrc" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="pic_radio" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="pic_small" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="song_id" optional="YES" attributeType="String" syncable="YES"/>
+        <attribute name="title" optional="YES" attributeType="String" syncable="YES"/>
+    </entity>
+    <elements>
+        <element name="SongDetail" positionX="-54" positionY="-9" width="128" height="150"/>
+    </elements>
+</model>

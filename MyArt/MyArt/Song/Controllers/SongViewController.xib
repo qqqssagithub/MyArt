@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="9059" systemVersion="14F27" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES">
+    <dependencies>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="9049"/>
+    </dependencies>
+    <objects>
+        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner" customClass="SongViewController">
+            <connections>
+                <outlet property="collectionView" destination="mdH-Dx-RBb" id="Z1z-8f-VJr"/>
+                <outlet property="view" destination="i5M-Pr-FkT" id="sfx-zR-JGt"/>
+            </connections>
+        </placeholder>
+        <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
+        <view clearsContextBeforeDrawing="NO" contentMode="scaleToFill" id="i5M-Pr-FkT">
+            <rect key="frame" x="0.0" y="0.0" width="600" height="600"/>
+            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+            <subviews>
+                <collectionView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" dataMode="none" translatesAutoresizingMaskIntoConstraints="NO" id="mdH-Dx-RBb">
+                    <rect key="frame" x="0.0" y="0.0" width="240" height="128"/>
+                    <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                    <collectionViewFlowLayout key="collectionViewLayout" minimumLineSpacing="44" minimumInteritemSpacing="10" id="JpP-UA-98Q">
+                        <size key="itemSize" width="150" height="150"/>
+                        <size key="headerReferenceSize" width="0.0" height="0.0"/>
+                        <size key="footerReferenceSize" width="0.0" height="0.0"/>
+                        <inset key="sectionInset" minX="33" minY="33" maxX="33" maxY="33"/>
+                    </collectionViewFlowLayout>
+                    <connections>
+                        <outlet property="dataSource" destination="-1" id="hJ6-rC-wZq"/>
+                        <outlet property="delegate" destination="-1" id="MyG-nQ-i9A"/>
+                    </connections>
+                </collectionView>
+            </subviews>
+            <color key="backgroundColor" red="1" green="0.5" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
+            <constraints>
+                <constraint firstItem="mdH-Dx-RBb" firstAttribute="leading" secondItem="i5M-Pr-FkT" secondAttribute="leading" id="KPf-Ty-A92"/>
+                <constraint firstAttribute="trailing" secondItem="mdH-Dx-RBb" secondAttribute="trailing" id="S5M-q0-jeb"/>
+                <constraint firstAttribute="bottom" secondItem="mdH-Dx-RBb" secondAttribute="bottom" id="d0S-7s-Afq"/>
+                <constraint firstItem="mdH-Dx-RBb" firstAttribute="top" secondItem="i5M-Pr-FkT" secondAttribute="top" id="lCc-dT-wVA"/>
+            </constraints>
+            <variation key="default">
+                <mask key="subviews">
+                    <exclude reference="mdH-Dx-RBb"/>
+                </mask>
+                <mask key="constraints">
+                    <exclude reference="KPf-Ty-A92"/>
+                    <exclude reference="S5M-q0-jeb"/>
+                    <exclude reference="d0S-7s-Afq"/>
+                    <exclude reference="lCc-dT-wVA"/>
+                </mask>
+            </variation>
+            <variation key="heightClass=regular-widthClass=compact">
+                <mask key="subviews">
+                    <include reference="mdH-Dx-RBb"/>
+                </mask>
+                <mask key="constraints">
+                    <include reference="KPf-Ty-A92"/>
+                    <include reference="S5M-q0-jeb"/>
+                    <include reference="d0S-7s-Afq"/>
+                    <include reference="lCc-dT-wVA"/>
+                </mask>
+            </variation>
+            <point key="canvasLocation" x="53" y="266"/>
+        </view>
+    </objects>
+</document>
