@@ -2,7 +2,7 @@
 //  SongDetail.h
 //  
 //
-//  Created by qianfeng0 on 15/12/24.
+//  Created by qqqssa on 15/12/24.
 //
 //
 

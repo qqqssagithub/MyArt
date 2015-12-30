@@ -2,7 +2,7 @@
 //  SongsModel.h
 //  MyMusicTest
 //
-//  Created by qianfeng0 on 15/12/13.
+//  Created by qqqssa on 15/12/13.
 //  Copyright © 2015年 陈少文. All rights reserved.
 //
 

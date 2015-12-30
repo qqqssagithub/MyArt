@@ -2,7 +2,7 @@
 //  RadioModel.h
 //  MyMusicTest
 //
-//  Created by qianfeng0 on 15/12/12.
+//  Created by qqqssa on 15/12/12.
 //  Copyright © 2015年 陈少文. All rights reserved.
 //
 
