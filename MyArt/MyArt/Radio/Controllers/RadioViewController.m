@@ -43,7 +43,6 @@
     [super viewDidAppear:animated];
     self.imgV.frame = CGRectMake(0, 0, self.view.bounds.size.width, SCREEN_HEIGHT - 64 -49);
     self.carousel.frame = CGRectMake(0, 0, self.view.bounds.size.width, SCREEN_HEIGHT - 64 -49);
-    [KVNProgress showWithParameters:@{KVNProgressViewParameterStatus: @"电台加载上线中,请稍等...", KVNProgressViewParameterFullScreen: @(YES)}];
 }
 
 #pragma mark -
@@ -60,6 +59,13 @@
     self.carousel.delegate = self;
     self.carousel.dataSource = self;
     
+    //初始化界面时的遮挡视图
+    [KVNProgress showWithParameters:@{KVNProgressViewParameterStatus: @"电台加载上线中,请稍等...", KVNProgressViewParameterBackgroundType:@(YES)}];
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(5 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+        [KVNProgress dismiss];
+    });
+    
+    
     self.jingdianlaoge = [NSMutableArray array];
     self.rege = [NSMutableArray array];
     self.chengmingqu = [NSMutableArray array];
@@ -72,6 +78,8 @@
     
     [self loadRadio];
     
+    
+    //点击加载失败的频道时弹出的提示框
     _alertController = [UIAlertController alertControllerWithTitle:@"提示" message:@"此电台频道初始化失败,请重新加载" preferredStyle:UIAlertControllerStyleAlert];
     UIAlertAction *okAction = [UIAlertAction actionWithTitle:@"加载" style:UIAlertActionStyleDefault handler:^(UIAlertAction *action) {
         [self reloadRadio:self.tempRadioName];
@@ -83,7 +91,7 @@
 }
 
 #pragma mark - UI
-
+//界面刷新遮挡视图
 - (void)setupBaseKVNProgressUI
 {
     // See the documentation of all appearance propoerties
@@ -124,6 +132,9 @@
     return 7;
 }
 
+
+
+//时光机
 - (UIView *)carousel:(iCarousel *)carousel viewForItemAtIndex:(NSInteger)index reusingView:(UIView *)view
 {
     if (view == nil)
@@ -141,6 +152,26 @@
         [imageView addSubview:self.label];
 
         
+//        UIImageView *backImageView = [[FXImageView alloc] initWithFrame:CGRectMake(0, 0, SCREEN_WIDTH * 0.7, SCREEN_WIDTH * 0.7)];
+//        backImageView.center = imageView.center;
+//        backImageView.image =
+//        backImageView.layer.cornerRadius = SCREEN_WIDTH * 0.7 /2;
+//        [imageView addSubview:backImageView];
+        
+        
+//        UIView *view0 = [[UIView alloc] initWithFrame:CGRectMake(0, 0, SCREEN_WIDTH * 0.3, SCREEN_WIDTH * 0.3)];
+//        view0.center = imageView.center;
+//        view0.backgroundColor = [UIColor colorWithWhite:0.0 alpha:0.4];
+//        view0.layer.cornerRadius = SCREEN_WIDTH * 0.3 /2;
+//        [imageView addSubview:view0];
+//        
+//        UIView *view1 = [[UIView alloc] initWithFrame:CGRectMake(0, 0, SCREEN_WIDTH * 0.1, SCREEN_WIDTH * 0.1)];
+//        view1.center = imageView.center;
+//        view1.backgroundColor = [UIColor whiteColor];
+//        view1.layer.cornerRadius = SCREEN_WIDTH * 0.1 /2;
+//        [imageView addSubview:view1];
+        
+        
         imageView.contentMode = UIViewContentModeScaleAspectFit;
         imageView.asynchronous = YES;
         imageView.reflectionScale = 0.2f;
@@ -148,13 +179,13 @@
         imageView.reflectionGap = 10.0f;
         imageView.shadowOffset = CGSizeMake(0.0f, 2.0f);
         imageView.shadowBlur = 5.0f;
-        imageView.cornerRadius = 10.0f;
+        imageView.cornerRadius = SCREEN_WIDTH * 0.7 /2;
         view = imageView;
     }
     
-    NSString *path = [[NSBundle mainBundle] pathForResource:self.radioPic[index] ofType:@"jpg"];
+    //NSString *path = [[NSBundle mainBundle] pathForResource:self.radioPic[index] ofType:@"jpg"];
     //set image
-    ((FXImageView *)view).image = [UIImage imageWithContentsOfFile:path];
+    ((FXImageView *)view).image = [UIImage imageNamed:self.radioPic[index]];
     
     return view;
 
@@ -236,7 +267,10 @@
     for (int i = 0; i < data.count - 2; i++) {
         [[NetDataEngine sharedInstance] GET:[NSString stringWithFormat:SONG_URL, data[i], SONG_URL_X] success:^(id responsData) {
             SongModel *oneSong = [SongModel parseRespondsData:responsData];
-            [songList addObject:oneSong];
+            //[self.songList addObject:oneSong];
+            if (oneSong.songFiles.count != 0) {
+                [songList addObject:oneSong];
+            }
         } failed:^(NSError *error) {
             NSLog(@"%@", error);
         }];
@@ -254,14 +288,16 @@
 
 - (void)fetchData:(NSString *)page ch:(NSString *)ch data:(NSMutableArray *)songList{
     static int i = 0; static int j = 0; j = 0;
-    [[NetDataEngine sharedInstance] GET:[[NSString stringWithFormat:URL_CH, page, ch] stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding] success:^(id responsData) {
+    NSString *url = [NSString stringWithFormat:URL_CH, page, ch];
+    //[[NSString stringWithFormat:URL_CH, page, ch] stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding]
+    [[NetDataEngine sharedInstance] GET:url success:^(id responsData) {
         NSMutableArray *arr = [NSMutableArray array];
         for (NSDictionary *dic in responsData[@"result"][@"songlist"]) {
-            NSString *song_id = dic[@"songid"];
-            if (song_id == nil) {
-                continue;
+            //NSString *song_id = dic[@"songid"];
+            if ([dic[@"songid"] isKindOfClass:[NSString class]]) {
+                [arr addObject:dic[@"songid"]];
             }
-            [arr addObject:song_id];
+            //[arr addObject:song_id];
         }
         i++; j++;
         [self loadSongList:arr songData:songList];
@@ -279,6 +315,7 @@
 - (void)didReceiveMemoryWarning {
     [super didReceiveMemoryWarning];
     // Dispose of any resources that can be recreated.
+    
 }
 
 /*

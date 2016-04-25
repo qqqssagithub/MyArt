@@ -71,7 +71,8 @@ NSString *const JHRefreshFooterStatusTextFailure = @"加载失败";
     {
         _statusLabel.text = JHRefreshFooterStatusTextNormal;
         _arrowImgView.transform = CGAffineTransformMakeRotation(M_PI);
-        _lastUpdateTimeLabel.hidden = YES;
+        _lastUpdateTimeLabel.hidden = NO;
+        _lastUpdateTimeLabel.text = @"数据由百度音乐提供, 仅做分享用";
     }
 }
 
@@ -186,7 +187,8 @@ NSString *const JHRefreshFooterStatusTextFailure = @"加载失败";
         }
             break;
     }
-    _lastUpdateTimeLabel.text = [JHRefreshConfig getLastUpdateTimeWithRefreshViewID:self.refreshViewID];
+    //_lastUpdateTimeLabel.text = [JHRefreshConfig getLastUpdateTimeWithRefreshViewID:self.refreshViewID];
+    //_lastUpdateTimeLabel.text = @"数据由百度音乐提供";
     [JHRefreshConfig updateLastUpdateTimeWithRefreshViewID:self.refreshViewID];
     [_activityView stopAnimating];
     _arrowImgView.hidden = NO;

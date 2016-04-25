@@ -33,6 +33,20 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
+    self.view.backgroundColor = [UIColor lightGrayColor];
+    
+    UILabel *backLabel = [[UILabel alloc] initWithFrame:CGRectMake(0, 12, SCREEN_WIDTH, 48)];
+    backLabel.numberOfLines = 3;
+    //backLabel.autoresizingMask = UIViewAutoresizingFlexibleWidth;
+    backLabel.font = [UIFont boldSystemFontOfSize:13];
+    //backLabel.textColor = [UIColor colorWithRed:150.0/255 green:150.0/255 blue:150.0/255 alpha:1];
+    backLabel.textColor = [UIColor whiteColor];
+    backLabel.backgroundColor = [UIColor clearColor];
+    backLabel.textAlignment = NSTextAlignmentCenter;
+    backLabel.text = @"APP所有音乐资源均取自百度音乐\n仅作为分享用\n不用于任何商业目的";
+    [self.view addSubview:backLabel];
+
+    
     self.songData = [[NSMutableArray alloc] init];
     self.songList = [[NSMutableArray alloc] init];
     [self cunstomUI];
@@ -77,11 +91,13 @@
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section{
+    self.tableView.backgroundColor = [UIColor clearColor];
     return self.dataSource.count;
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath{
     ListTableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"list" forIndexPath:indexPath];
+    cell.selectionStyle = UITableViewCellSelectionStyleNone;
     ListModel *model = [self.dataSource objectAtIndex:indexPath.row];
     [cell updateWith:model path:self.pic[indexPath.row]];
     return cell;
@@ -96,9 +112,22 @@
     [self.songData removeAllObjects];
     [self.songList removeAllObjects];
     [self fenchSongData:indexPath.row];
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(4 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+        [KVNProgress dismiss];
+    });
+}
+
+- (void)isNetworking{
+    if ([[Reachability reachabilityForLocalWiFi] currentReachabilityStatus] == NotReachable) {
+        [KVNProgress dismiss];
+        UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"请检查网络连接" message:nil delegate:nil cancelButtonTitle:@"确定" otherButtonTitles:nil, nil];
+        [alert show];
+        return;
+    }
 }
 
 - (void)fenchSongData:(NSInteger)index{//获取列表
+    [self isNetworking];
     [[NetDataEngine sharedInstance] GET:[NSString stringWithFormat:URL_songData, ((ListModel *)self.dataSource[index]).type] success:^(id responsData) {
         NSArray *arr = responsData[@"song_list"];
         for (NSDictionary *dic in arr) {
@@ -112,19 +141,23 @@
 }
 
 - (void)loadSongList{
+    [self isNetworking];
     static int index = 0;
     for (int i = 0; i < 30 && i < self.songData.count; i++) {
-        index++;
         [[NetDataEngine sharedInstance] GET:[NSString stringWithFormat:SONG_URL, self.songData[i], SONG_URL_X] success:^(id responsData) {
+            index++;
             SongModel *oneSong = [SongModel parseRespondsData:responsData];
-            [self.songList addObject:oneSong];
-            if (self.songList.count == 30 || self.songList.count == self.songData.count) {
+            if (oneSong.songFiles.count != 0) {
+                [self.songList addObject:oneSong];
+            }
+            if (index == 30 || self.songList.count == self.songData.count) {
                 self.loadMusic(self.songList);
+                index = 0;
                 [KVNProgress dismiss];
             }
-            if (index == self.songData.count && index > self.songList.count) {
-                NSLog(@"歌曲列表刷新失败,请重新刷新");
-            }
+//            if (index == self.songData.count && index > self.songList.count) {
+//                NSLog(@"歌曲列表刷新失败,请重新刷新");
+//            }
         } failed:^(NSError *error) {
             NSLog(@"%@", error);
         }];

@@ -88,7 +88,9 @@
     for (int i = 0; i < self.dataSource.count - 1; i++) {
         [[NetDataEngine sharedInstance] GET:[NSString stringWithFormat:SONG_URL, ((RecommendedModel *)(self.dataSource[i])).song_id, SONG_URL_X] success:^(id responsData) {
             SongModel *oneSong = [SongModel parseRespondsData:responsData];
-            [self.songList addObject:oneSong];
+            if (oneSong.songFiles.count != 0) {
+                [self.songList addObject:oneSong];
+            }
             if (self.songList.count == self.dataSource.count - 1) {
                 [UIView animateWithDuration:0.5 animations:^{
                     _topImageView.alpha =0.0;

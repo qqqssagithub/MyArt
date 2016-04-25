@@ -126,7 +126,7 @@ typedef NS_ENUM(NSInteger, CirculationMode) {
 
 @property(nonatomic) CirculationMode cycleMode;
 
-
+@property (nonatomic) Reachability *netState;//此时网络状态
 
 @end
 
@@ -238,8 +238,8 @@ typedef NS_ENUM(NSInteger, CirculationMode) {
         [self playAtIndex:currentInex];
         return;
     }
-    if (currentInex == self.playerItems.count - 1) {
-        currentInex = 0;
+    if (currentInex == 0) {
+        currentInex = self.playerItems.count -1;
         [self playAtIndex:currentInex];
         return;
     }
@@ -273,7 +273,6 @@ typedef NS_ENUM(NSInteger, CirculationMode) {
 #pragma mark - 载入界面
 - (void)viewDidLoad {
     [super viewDidLoad];
-    
     //初始化播放界面
     [self customPlayView];
     
@@ -289,6 +288,9 @@ typedef NS_ENUM(NSInteger, CirculationMode) {
     
     //添加播放状态监听
     [self addPlayingStateKVO];
+    
+    //添加网络状态监听
+    [self addNetState];
     
     //显示当前的播放时间和更新进度
     [self updateSchedule];
@@ -349,13 +351,16 @@ typedef NS_ENUM(NSInteger, CirculationMode) {
         [weakSelf.view bringSubviewToFront:weakSelf.playPointView];
         
         [weakSelf.tableView registerNib:[UINib nibWithNibName:@"MainTableViewCell" bundle:nil] forCellReuseIdentifier:@"xxx"];
-        weakSelf.left.constant = 30.0;
-        weakSelf.top.constant = 30.0;
-        weakSelf.bottom.constant = 30.0;
-        weakSelf.right.constant = 30.0;
-        [UIView animateWithDuration:0.5 animations:^{
-            weakSelf.baseView.alpha = 0.5;
-            [weakSelf.baseView layoutIfNeeded];
+//        weakSelf.left.constant = 30.0;
+//        weakSelf.top.constant = 30.0;
+//        weakSelf.bottom.constant = 30.0;
+//        weakSelf.right.constant = 30.0;
+        CGAffineTransform newTransform =
+        CGAffineTransformScale([UIApplication sharedApplication].keyWindow.transform, 0.7, 0.7);
+        [UIView animateWithDuration:0.4 animations:^{
+            [weakSelf.baseView setTransform:newTransform];
+//            weakSelf.baseView.alpha = 0.5;
+//            [weakSelf.baseView layoutIfNeeded];
             weakSelf.tableView.frame = CGRectMake(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
         }];
         [weakSelf costomHeaderView:title];
@@ -390,13 +395,14 @@ typedef NS_ENUM(NSInteger, CirculationMode) {
 
 - (void)backMainView{
     self.IS_LIKE = NO;
-    self.left.constant = -20.0;
-    self.top.constant = -20.0;
-    self.bottom.constant = 0.0;
-    self.right.constant = -20.0;
+//    self.left.constant = -20.0;
+//    self.top.constant = -20.0;
+//    self.bottom.constant = 0.0;
+//    self.right.constant = -20.0;
+    CGAffineTransform newTransform =
+    CGAffineTransformScale([UIApplication sharedApplication].keyWindow.transform, 1.0, 1.0);
     [UIView animateWithDuration:0.4 animations:^{
-        self.baseView.alpha = 1.0;
-        [self.baseView layoutIfNeeded];
+        [self.baseView setTransform:newTransform];
         self.tableView.frame = CGRectMake(SCREEN_WIDTH, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
     }];
     
@@ -699,7 +705,7 @@ typedef NS_ENUM(NSInteger, CirculationMode) {
             [dict setObject:[NSString stringWithFormat:@"%f", self.totalSecond] forKey:MPMediaItemPropertyPlaybackDuration];
             //[dict setObject:@"这是歌词" forKey:MPMediaItemPropertyLyrics];
             UIImage *image = [UIImage imageNamed:@"cdbg"];
-            [dict setObject:[[MPMediaItemArtwork alloc] initWithImage:image]forKey:MPMediaItemPropertyArtwork];
+            [dict setObject:[[MPMediaItemArtwork alloc] initWithImage:image] forKey:MPMediaItemPropertyArtwork];
             UIImage *newImage = [[SDImageCache sharedImageCache] imageFromDiskCacheForKey:self.oneSongDetail.pic_radio];
             if (newImage != nil) {
                 [dict setObject:[[MPMediaItemArtwork alloc] initWithImage:newImage]forKey:MPMediaItemPropertyArtwork];
@@ -715,7 +721,7 @@ typedef NS_ENUM(NSInteger, CirculationMode) {
             [dict setObject:[[MPMediaItemArtwork alloc] initWithImage:image]forKey:MPMediaItemPropertyArtwork];
             UIImage *newImage = [[SDImageCache sharedImageCache] imageFromDiskCacheForKey:self.oneSong.pic_radio];
             if (newImage != nil) {
-                [dict setObject:[[MPMediaItemArtwork alloc] initWithImage:newImage]forKey:MPMediaItemPropertyArtwork];
+                [dict setObject:[[MPMediaItemArtwork alloc] initWithImage:newImage] forKey:MPMediaItemPropertyArtwork];
             }
             [[MPNowPlayingInfoCenter defaultCenter] setNowPlayingInfo:dict];
         }
@@ -745,6 +751,53 @@ typedef NS_ENUM(NSInteger, CirculationMode) {
                           context:nil];
 }
 
+#pragma mark - 添加网络状态监听 以及 状态回调
+- (void)addNetState{
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(networkStateChange) name:kReachabilityChangedNotification object:nil];
+    self.netState = [Reachability reachabilityForInternetConnection];
+    [self.netState startNotifier];
+}
+
+- (void)networkStateChange {
+     [self checkNetworkState];
+}
+
+- (void)checkNetworkState {
+    NSString *netTitle;
+    Reachability *nowNetState = [Reachability reachabilityForInternetConnection];
+    if ([nowNetState currentReachabilityStatus] == ReachableViaWiFi) {
+        NSLog(@"此时为wifi网络");
+        netTitle = @"此时为wifi网络";
+    } else if ([nowNetState currentReachabilityStatus] == ReachableViaWWAN) {
+        NSLog(@"此时为4G/3G/2G网络");
+        netTitle = @"此时为4G/3G/2G网络";
+    } else {
+        NSLog(@"似乎已断开与互联网的连接");
+        netTitle = @"似乎已断开与互联网的连接";
+    }
+    UIView *backView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT)];
+    backView.backgroundColor = [UIColor colorWithWhite:0.0 alpha:0.3];
+    [[UIApplication sharedApplication].keyWindow addSubview:backView];
+    UIView *whiteView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, SCREEN_WIDTH -48, 44)];
+    whiteView.layer.cornerRadius = 5;
+    whiteView.layer.masksToBounds = YES;
+    whiteView.backgroundColor = [UIColor colorWithWhite:1.0 alpha:0.9];
+    whiteView.center = backView.center;
+    [backView addSubview:whiteView];
+    UILabel *netLabel = [[UILabel alloc] initWithFrame:CGRectMake(0, 12, SCREEN_WIDTH -48, 20)];
+    netLabel.text = netTitle;
+    netLabel.textAlignment = NSTextAlignmentCenter;
+    netLabel.textColor = [UIColor blackColor];
+    [whiteView addSubview:netLabel];
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(2 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+        [backView removeFromSuperview];
+    });
+}
+
+- (void)dealloc {
+     [self.netState stopNotifier];
+     [[NSNotificationCenter defaultCenter] removeObserver:self];
+ }
 
 //播放状态KVO回调
 - (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context{
@@ -767,15 +820,14 @@ typedef NS_ENUM(NSInteger, CirculationMode) {
     if ([keyPath isEqualToString:@"loadedTimeRanges"]) {
         self.totalSecond = self.queuePlayer.currentItem.duration.value / self.queuePlayer.currentItem.duration.timescale;//转换成秒
         self.totalTime.text = [self convertTime:self.totalSecond];
-        
         CMTime duration = self.queuePlayer.currentItem.duration;
         CGFloat totalDuration = CMTimeGetSeconds(duration);
         double time = [self availableDuration];// 计算缓冲进度
         self.buffer = time / totalDuration;
         self.progressView.progress = time / totalDuration ;
     }
-    
     if ([keyPath isEqualToString:@"currentSecond"]) {
+        //NSLog(@"currentSecond:%f , totalSecond:%f", self.currentSecond, self.totalSecond);
         if (((int)self.currentSecond - (int)self.totalSecond == 1.00 || (int)self.currentSecond - (int)self.totalSecond == -1.00) && self.currentSecond != 0) {
             [self nextMusic];
         }
@@ -783,15 +835,27 @@ typedef NS_ENUM(NSInteger, CirculationMode) {
 }
 
 
+
+
+
 //刷新歌曲名称等信息
 - (void)currentMusicIndexInfo{
     if (self.IS_LIKEOPEN) {
         self.songLabel.text = self.oneSongDetail.title;
-        self.author.text = [NSString stringWithFormat:@"%@ - %@", self.oneSongDetail.author, self.oneSongDetail.album_title];
+        if (self.oneSong.album_title.length != 0) {
+            self.author.text = [NSString stringWithFormat:@"%@ - %@", self.oneSong.author, self.oneSong.album_title];
+        } else {
+            self.author.text = [NSString stringWithFormat:@"%@", self.oneSong.author];
+        }
         [self.starImgV sd_setImageWithURL:[NSURL URLWithString:self.oneSongDetail.pic_radio]];
     } else {
         self.songLabel.text = self.oneSong.title;
-        self.author.text = [NSString stringWithFormat:@"%@ - %@", self.oneSong.author, self.oneSong.album_title];
+        if (self.oneSong.album_title.length != 0) {
+            self.author.text = [NSString stringWithFormat:@"%@ - %@", self.oneSong.author, self.oneSong.album_title];
+        } else {
+            self.author.text = [NSString stringWithFormat:@"%@", self.oneSong.author];
+        }
+        
         [self.starImgV sd_setImageWithURL:[NSURL URLWithString:self.oneSong.pic_radio]];
     }
     
@@ -926,6 +990,7 @@ typedef NS_ENUM(NSInteger, CirculationMode) {
     if (!isnan(totalDuration)) {
         CGFloat second = duration.value / duration.timescale;//转换成秒
         self.totalTime.text = [self convertTime:second];
+        self.totalSecond = self.queuePlayer.currentItem.duration.value / self.queuePlayer.currentItem.duration.timescale;
         double time = [self availableDuration];
         self.progressView.progress = time / totalDuration;
     }
@@ -970,6 +1035,8 @@ typedef NS_ENUM(NSInteger, CirculationMode) {
     [self.playView.layer removeAllAnimations];
     [self.playView.layer addAnimation:opacityAnimationA forKey:@"opacity"];
     
+    [self.view bringSubviewToFront:self.playView];
+    [self.view bringSubviewToFront:self.playButtonView];
     
     [UIView animateWithDuration:0.3 animations:^{
         self.playButtonView.frame = CGRectMake(0, SCREEN_HEIGHT - self.playBottomView.bounds.size.height, self.playBottomView.bounds.size.width, self.playBottomView.bounds.size.height);
@@ -1433,13 +1500,21 @@ typedef NS_ENUM(NSInteger, CirculationMode) {
     [self.view bringSubviewToFront:self.playPointView];
     
     [self.tableView registerNib:[UINib nibWithNibName:@"MainTableViewCell" bundle:nil] forCellReuseIdentifier:@"xxx"];
-    self.left.constant = 30.0;
-    self.top.constant = 30.0;
-    self.bottom.constant = 30.0;
-    self.right.constant = 30.0;
-    [UIView animateWithDuration:0.5 animations:^{
-        self.baseView.alpha = 0.5;
-        [self.baseView layoutIfNeeded];
+//    self.left.constant = 30.0;
+//    self.top.constant = 30.0;
+//    self.bottom.constant = 30.0;
+//    self.right.constant = 30.0;
+//    [UIView animateWithDuration:0.5 animations:^{
+//        self.baseView.alpha = 0.5;
+//        [self.baseView layoutIfNeeded];
+//        self.tableView.frame = CGRectMake(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
+//    }];
+    CGAffineTransform newTransform =
+    CGAffineTransformScale([UIApplication sharedApplication].keyWindow.transform, 0.7, 0.7);
+    [UIView animateWithDuration:0.4 animations:^{
+        [self.baseView setTransform:newTransform];
+        //            weakSelf.baseView.alpha = 0.5;
+        //            [weakSelf.baseView layoutIfNeeded];
         self.tableView.frame = CGRectMake(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
     }];
     [self costomHeaderView:title];

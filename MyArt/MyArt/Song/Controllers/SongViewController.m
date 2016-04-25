@@ -42,9 +42,6 @@
     [self fetchData:1];
     [self createRefreshHeadView];
     [self createRefreshFootView];
-    
-    
-    [self setupBaseKVNProgressUI];
 }
 
 #pragma mark - UI
@@ -65,6 +62,21 @@
     [KVNProgress appearance].lineWidth = 2.0f;
 }
 
+- (void)setupBaseKVNProgressUIRefresh
+{
+    // See the documentation of all appearance propoerties
+//    [KVNProgress appearance].statusColor = [UIColor darkGrayColor];
+//    [KVNProgress appearance].statusFont = [UIFont systemFontOfSize:17.0f];
+    [KVNProgress appearance].circleStrokeForegroundColor = [UIColor darkGrayColor];
+    [KVNProgress appearance].circleStrokeBackgroundColor = [[UIColor darkGrayColor] colorWithAlphaComponent:0.3f];
+    [KVNProgress appearance].circleFillBackgroundColor = [UIColor clearColor];
+    [KVNProgress appearance].backgroundFillColor = [UIColor colorWithWhite:0.9f alpha:0.9f];
+    [KVNProgress appearance].backgroundTintColor = [UIColor whiteColor];
+    [KVNProgress appearance].successColor = [UIColor darkGrayColor];
+    [KVNProgress appearance].errorColor = [UIColor darkGrayColor];
+    [KVNProgress appearance].circleSize = 30.0f;
+    [KVNProgress appearance].lineWidth = 2.0f;
+}
 
 - (void)customUI{
     [self.collectionView registerNib:[UINib nibWithNibName:@"SongCollectionViewCell" bundle:nil] forCellWithReuseIdentifier:@"coll"];
@@ -87,11 +99,15 @@
         if (weakSelf.isRefreshing) {
             return ;
         }
+        [self setupBaseKVNProgressUIRefresh];
+        [KVNProgress show];
+        [self isNetworking];
         weakSelf.isRefreshing = YES;
         weakSelf.page = 1;
         [self fetchData:weakSelf.page];
         dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(2 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
             //刷新结束
+            [KVNProgress dismiss];
             //1:刷表
             [weakSelf.collectionView reloadData];
             //2:设置刷新状态为NO
@@ -110,11 +126,15 @@
         if (weakSelf.isRefreshing) {
             return ;
         }
+        [self setupBaseKVNProgressUIRefresh];
+        [KVNProgress show];
         weakSelf.isRefreshing = YES;
+        [self isNetworking];
         weakSelf.page++;
         [self fetchData:weakSelf.page];
-        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(2* NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.5* NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
             //上拉加载更多结束
+            [KVNProgress dismiss];
             [weakSelf.collectionView reloadData];
             weakSelf.isRefreshing = NO;
             //让footView 结束刷新状态
@@ -162,13 +182,28 @@
 }
 
 - (void)collectionView:(UICollectionView *)collectionView didSelectItemAtIndexPath:(NSIndexPath *)indexPath{
+    [self setupBaseKVNProgressUI];
     [KVNProgress showWithStatus:@"歌单加载中..."];
     [self.songData removeAllObjects];
     [self.songList removeAllObjects];
     [self fenchSongData:indexPath.row];
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(4 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+        [KVNProgress dismiss];
+    });
 }
 
+- (void)isNetworking{
+    if ([[Reachability reachabilityForLocalWiFi] currentReachabilityStatus] == NotReachable) {
+        [KVNProgress dismiss];
+        UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"请检查网络连接" message:nil delegate:nil cancelButtonTitle:@"确定" otherButtonTitles:nil, nil];
+        [alert show];
+        return;
+    }
+}
+
+
 - (void)fenchSongData:(NSInteger)index{//获取列表
+    [self isNetworking];
     [[NetDataEngine sharedInstance] GET:[NSString stringWithFormat:URL_SONGMODEL, ((SongsModel *)self.dataSource[index]).listid] success:^(id responsData) {
         NSArray *arr = responsData[@"content"];
         for (NSDictionary *dic in arr) {
@@ -182,10 +217,13 @@
 }
 
 - (void)loadSongList{
+    [self isNetworking];
     for (int i = 0; i < self.songData.count; i++) {
         [[NetDataEngine sharedInstance] GET:[NSString stringWithFormat:SONG_URL, self.songData[i], SONG_URL_X] success:^(id responsData) {
             SongModel *oneSong = [SongModel parseRespondsData:responsData];
-            [self.songList addObject:oneSong];
+            if (oneSong.songFiles.count != 0) {
+                [self.songList addObject:oneSong];
+            }
             if (self.songList.count == self.songData.count) {
                 self.loadMusic(self.songList);
                 [KVNProgress dismiss];
