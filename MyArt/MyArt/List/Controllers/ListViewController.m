@@ -57,7 +57,7 @@
 
     self.pic = @[@"新歌.jpg", @"热歌.jpg", @"欧美.jpg", @"king.jpg", @"原创.jpg", @"华语.jpg", @"金典.jpg", @"网络.jpg", @"影视.jpg", @"对唱.jpg", @"bi.jpg", @"摇滚.jpg", @"ktv.jpg", @"cc.jpg",];
     
-    [self setupBaseKVNProgressUI];
+    [self setupBaseKVNProgressUI];//
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(5 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
         if (self.dataSource.count == 0) {
             [self addTempView];
