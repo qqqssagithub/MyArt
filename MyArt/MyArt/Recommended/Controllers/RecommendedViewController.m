@@ -30,6 +30,8 @@
 
 @property (nonatomic, retain) DBSphereView *sphereView;
 
+@property (nonatomic) NetworkRefreshFailedView *networkRefreshFailedView;
+
 @end
 
 
@@ -52,6 +54,38 @@
     [self.loadButton setTitle:@"精彩内容加载中..." forState:UIControlStateNormal];
     self.loadButton.enabled = NO;
     [self fetchData];
+    _networkRefreshFailedView = nil;
+}
+
+
+#pragma mark - 网络判断
+- (void)addTempView{
+    if (_networkRefreshFailedView == nil) {
+        _networkRefreshFailedView = [[NetworkRefreshFailedView alloc] init];
+        UITapGestureRecognizer *netViewtapGR=[[UITapGestureRecognizer alloc]initWithTarget:self action:@selector(netViewtapGR:)];
+        [_networkRefreshFailedView addGestureRecognizer:netViewtapGR];
+        [self.view addSubview:_networkRefreshFailedView];
+    }
+}
+
+-(void)netViewtapGR:(UITapGestureRecognizer *)tapGR{
+    [self isNetworking];
+}
+
+- (void)isNetworking{
+    if ([[Reachability reachabilityForLocalWiFi] currentReachabilityStatus] == NotReachable) {
+        UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"请检查网络连接" message:nil delegate:nil cancelButtonTitle:@"确定" otherButtonTitles:nil, nil];
+        [alert show];
+        return;
+    }
+    if (_networkRefreshFailedView != nil) {
+        [_networkRefreshFailedView removeFromSuperview];
+        _networkRefreshFailedView = nil;
+    }
+    if (self.songList.count == self.dataSource.count - 1 != 0) {
+    } else {
+        [self fetchData];
+    }
 }
 
 #pragma mark - UI
@@ -74,14 +108,19 @@
 }
 
 #pragma mark - 网络请求
-
 - (void)fetchData{
     [[NetDataEngine sharedInstance] GET:URL success:^(id responsData) {
         self.dataSource = [RecommendedModel parseRespondsData:responsData];
         [self loadSongList];
     } failed:^(NSError *error) {
-        NSLog(@"%@", error);
+        NSLog(@"网络错误:%@", error);
+        [self addTempView];
     }];
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(5 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+        if (self.dataSource.count == 0) {
+            [self addTempView];
+        }
+    });
 }
 
 - (void)loadSongList{
@@ -92,7 +131,7 @@
                 [self.songList addObject:oneSong];
             }
             if (self.songList.count == self.dataSource.count - 1) {
-                [UIView animateWithDuration:0.5 animations:^{
+                [UIView animateWithDuration:0.1 animations:^{
                     _topImageView.alpha =0.0;
                     self.activityView.alpha = 0.0;
                     self.bigActivityView.alpha = 0.0;
@@ -113,8 +152,14 @@
             }
         } failed:^(NSError *error) {
             NSLog(@"%@", error);
+            [self addTempView];
         }];
     }
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(5 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+        if (self.songList.count != self.dataSource.count - 1) {
+            [self addTempView];
+        }
+    });
 }
 
 #pragma mark - 加载音乐

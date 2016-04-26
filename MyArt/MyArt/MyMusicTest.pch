@@ -34,6 +34,7 @@
 #import "ListViewController.h"
 #import "RadioViewController.h"
 #import "Reachability.h"
+#import "NetworkRefreshFailedView.h"
 
 //屏幕尺寸定义
 #define SCREEN_WIDTH  [UIScreen mainScreen].bounds.size.width

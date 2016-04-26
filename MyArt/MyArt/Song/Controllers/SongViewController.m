@@ -23,6 +23,8 @@
 @property (nonatomic) NSInteger page;
 @property (nonatomic) BOOL isRefreshing;
 
+@property (nonatomic) NetworkRefreshFailedView *networkRefreshFailedView;
+
 @end
 
 @implementation SongViewController
@@ -42,6 +44,41 @@
     [self fetchData:1];
     [self createRefreshHeadView];
     [self createRefreshFootView];
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(5 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+        if (self.dataSource.count == 0) {
+            [self addTempView];
+        }
+    });
+}
+
+- (void)addTempView{
+    if (_networkRefreshFailedView == nil) {
+        _networkRefreshFailedView = [[NetworkRefreshFailedView alloc] init];
+        UITapGestureRecognizer *netViewtapGR=[[UITapGestureRecognizer alloc]initWithTarget:self action:@selector(netViewtapGR:)];
+        [_networkRefreshFailedView addGestureRecognizer:netViewtapGR];
+        [self.view addSubview:_networkRefreshFailedView];
+    }
+}
+
+-(void)netViewtapGR:(UITapGestureRecognizer *)tapGR{
+    if ([[Reachability reachabilityForLocalWiFi] currentReachabilityStatus] == NotReachable) {
+        [KVNProgress dismiss];
+        UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"请检查网络连接" message:nil delegate:nil cancelButtonTitle:@"确定" otherButtonTitles:nil, nil];
+        [alert show];
+        return;
+    }
+    if (_networkRefreshFailedView != nil) {
+        [_networkRefreshFailedView removeFromSuperview];
+        _networkRefreshFailedView = nil;
+    }
+    if (self.dataSource.count == 0) {
+        [self fetchData:1];
+    }
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(5 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+        if (self.dataSource.count == 0) {
+            [self addTempView];
+        }
+    });
 }
 
 #pragma mark - UI
@@ -92,16 +129,21 @@
 
 - (void)createRefreshHeadView
 {
-    //防止循环引用
     __weak typeof(self) weakSelf = self;
     [self.collectionView addRefreshHeaderViewWithAniViewClass:[JHRefreshCommonAniView class] beginRefresh:^{
+        if ([[Reachability reachabilityForLocalWiFi] currentReachabilityStatus] == NotReachable) {
+            [KVNProgress dismiss];
+            UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"请检查网络连接" message:nil delegate:nil cancelButtonTitle:@"确定" otherButtonTitles:nil, nil];
+            [alert show];
+            [weakSelf.collectionView headerEndRefreshingWithResult:JHRefreshResultNone];
+            return;
+        }
         //如果正在刷新中，直接返回
         if (weakSelf.isRefreshing) {
             return ;
         }
         [self setupBaseKVNProgressUIRefresh];
         [KVNProgress show];
-        [self isNetworking];
         weakSelf.isRefreshing = YES;
         weakSelf.page = 1;
         [self fetchData:weakSelf.page];
@@ -123,13 +165,19 @@
 {
     __weak typeof(self) weakSelf = self;
     [self.collectionView addRefreshFooterViewWithAniViewClass:[JHRefreshCommonAniView class] beginRefresh:^{
+        if ([[Reachability reachabilityForLocalWiFi] currentReachabilityStatus] == NotReachable) {
+            [KVNProgress dismiss];
+            UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"请检查网络连接" message:nil delegate:nil cancelButtonTitle:@"确定" otherButtonTitles:nil, nil];
+            [alert show];
+            [weakSelf.collectionView footerEndRefreshing];
+            return;
+        }
         if (weakSelf.isRefreshing) {
             return ;
         }
         [self setupBaseKVNProgressUIRefresh];
         [KVNProgress show];
         weakSelf.isRefreshing = YES;
-        [self isNetworking];
         weakSelf.page++;
         [self fetchData:weakSelf.page];
         dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.5* NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
@@ -158,8 +206,8 @@
         [self.collectionView reloadData];
     } failed:^(NSError *error) {
         NSLog(@"%@", error);
+        [self addTempView];
     }];
-    
 }
 
 #pragma mark - delegate

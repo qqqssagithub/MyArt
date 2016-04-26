@@ -35,6 +35,7 @@
 
 @property (nonatomic) NSString *tempRadioName;
 @property (nonatomic) BOOL reload;
+
 @end
 
 
@@ -52,7 +53,7 @@
 {
     [super viewDidLoad];
     self.radioNames = @[@"经典老歌", @"劲爆热歌", @"成名金曲", @"流行欧美", @"网络歌曲", @"随便听听", @"电影原声"];
-    self.radioPic = @[@"jd", @"jg", @"cmq", @"om", @"wl", @"sbtt", @"dy"];
+    self.radioPic = @[@"jd.png", @"jg.png", @"cmq.png", @"om.png", @"wl.png", @"sbtt.png", @"dy.png"];
     self.tag = @[@(3000), @(3001), @(3002), @(3003), @(3004), @(3005), @(3006)];
     self.carousel.type = iCarouselTypeInvertedTimeMachine;
     self.carousel.pagingEnabled = YES;
@@ -88,6 +89,10 @@
     
     
     [self setupBaseKVNProgressUI];
+    
+    
+    
+    
 }
 
 #pragma mark - UI
@@ -144,34 +149,6 @@
         UITapGestureRecognizer * tapGR=[[UITapGestureRecognizer alloc]initWithTarget:self action:@selector(tapGR:)];
         [imageView addGestureRecognizer:tapGR];
         
-        
-        imageView.tag = [self.tag[index] integerValue];
-        self.label = [[UILabel alloc] initWithFrame:CGRectMake(10, 10, 100, 30)];
-        self.label.text = self.radioNames[index];
-        self.label.textColor = [UIColor purpleColor];
-        [imageView addSubview:self.label];
-
-        
-//        UIImageView *backImageView = [[FXImageView alloc] initWithFrame:CGRectMake(0, 0, SCREEN_WIDTH * 0.7, SCREEN_WIDTH * 0.7)];
-//        backImageView.center = imageView.center;
-//        backImageView.image =
-//        backImageView.layer.cornerRadius = SCREEN_WIDTH * 0.7 /2;
-//        [imageView addSubview:backImageView];
-        
-        
-//        UIView *view0 = [[UIView alloc] initWithFrame:CGRectMake(0, 0, SCREEN_WIDTH * 0.3, SCREEN_WIDTH * 0.3)];
-//        view0.center = imageView.center;
-//        view0.backgroundColor = [UIColor colorWithWhite:0.0 alpha:0.4];
-//        view0.layer.cornerRadius = SCREEN_WIDTH * 0.3 /2;
-//        [imageView addSubview:view0];
-//        
-//        UIView *view1 = [[UIView alloc] initWithFrame:CGRectMake(0, 0, SCREEN_WIDTH * 0.1, SCREEN_WIDTH * 0.1)];
-//        view1.center = imageView.center;
-//        view1.backgroundColor = [UIColor whiteColor];
-//        view1.layer.cornerRadius = SCREEN_WIDTH * 0.1 /2;
-//        [imageView addSubview:view1];
-        
-        
         imageView.contentMode = UIViewContentModeScaleAspectFit;
         imageView.asynchronous = YES;
         imageView.reflectionScale = 0.2f;
@@ -181,12 +158,21 @@
         imageView.shadowBlur = 5.0f;
         imageView.cornerRadius = SCREEN_WIDTH * 0.7 /2;
         view = imageView;
+        
+        UIImageView *imageView0 = [[UIImageView alloc] initWithFrame:CGRectMake(0, 0, SCREEN_WIDTH * 0.7, SCREEN_WIDTH * 0.7)];
+        imageView0.center = view.center;
+        imageView0.layer.cornerRadius = SCREEN_WIDTH * 0.7 /2;
+        imageView0.image = [UIImage imageNamed:self.radioPic[index]];
+        [view addSubview:imageView0];
+        
+        imageView.tag = [self.tag[index] integerValue];
+        self.label = [[UILabel alloc] initWithFrame:CGRectMake(10, 10, 100, 30)];
+        self.label.text = self.radioNames[index];
+        self.label.textColor = [UIColor purpleColor];
+        [imageView addSubview:self.label];
     }
     
-    //NSString *path = [[NSBundle mainBundle] pathForResource:self.radioPic[index] ofType:@"jpg"];
-    //set image
-    ((FXImageView *)view).image = [UIImage imageNamed:self.radioPic[index]];
-    
+    //((FXImageView *)view).image = [UIImage imageNamed:self.radioPic[index]];
     return view;
 
 }
