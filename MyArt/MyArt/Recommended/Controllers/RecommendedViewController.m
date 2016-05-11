@@ -91,7 +91,7 @@
 #pragma mark - UI
 - (void)customMainView{
     [_topImageView sd_setImageWithURL:[self.dataSource lastObject][@"pic_w700"]];
-    [UIView animateWithDuration:0.5 animations:^{
+    [UIView animateWithDuration:0.1 animations:^{
         _topImageView.alpha = 1.0;
     } completion:^(BOOL finished) {
         UITapGestureRecognizer * tapGR=[[UITapGestureRecognizer alloc]initWithTarget:self action:@selector(tapGR:)];

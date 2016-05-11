@@ -61,7 +61,8 @@
     self.carousel.dataSource = self;
     
     //初始化界面时的遮挡视图
-    [KVNProgress showWithParameters:@{KVNProgressViewParameterStatus: @"电台加载上线中,请稍等...", KVNProgressViewParameterBackgroundType:@(YES)}];
+    [self setupBaseKVNProgressUI];
+    [KVNProgress showWithParameters:@{KVNProgressViewParameterStatus: @"电台加载上线中,请稍等...", KVNProgressViewParameterBackgroundType:@(NO)}];
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(5 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
         [KVNProgress dismiss];
     });
@@ -88,10 +89,6 @@
     [_alertController addAction:okAction];
     
     
-    [self setupBaseKVNProgressUI];
-    
-    
-    
     
 }
 
@@ -101,7 +98,7 @@
 {
     // See the documentation of all appearance propoerties
     [KVNProgress appearance].statusColor = [UIColor darkGrayColor];
-    [KVNProgress appearance].statusFont = [UIFont systemFontOfSize:17.0f];
+    [KVNProgress appearance].statusFont = [UIFont systemFontOfSize:14.0f];
     [KVNProgress appearance].circleStrokeForegroundColor = [UIColor darkGrayColor];
     [KVNProgress appearance].circleStrokeBackgroundColor = [[UIColor darkGrayColor] colorWithAlphaComponent:0.3f];
     [KVNProgress appearance].circleFillBackgroundColor = [UIColor clearColor];
@@ -115,19 +112,29 @@
 
 
 - (void)loadRadio{
-    [self fetchData:[self getdate] ch:@"public_shiguang_jingdianlaoge" data:self.jingdianlaoge];
-    [self fetchData:[self getdate] ch:@"public_tuijian_rege" data:self.rege];
-    [self fetchData:[self getdate] ch:@"public_tuijian_chengmingqu" data:self.chengmingqu];
-    [self fetchData:[self getdate] ch:@"public_yuzhong_oumei" data:self.oumei];
-    [self fetchData:[self getdate] ch:@"public_tuijian_wangluo" data:self.wangluo];
-    [self fetchData:[self getdate] ch:@"public_tuijian_suibiantingting" data:self.suibiantingting];
-    [self fetchData:[self getdate] ch:@"public_fengge_dianyingyuansheng" data:self.dianyingyuansheng];
+    NSArray *chArr = @[@"public_shiguang_jingdianlaoge", @"public_tuijian_rege", @"public_tuijian_chengmingqu", @"public_yuzhong_oumei", @"public_tuijian_wangluo", @"public_tuijian_suibiantingting", @"public_fengge_dianyingyuansheng"];
+    NSArray *dataArr = @[self.jingdianlaoge, self.rege, self.chengmingqu, self.oumei, self.wangluo, self.suibiantingting, self.dianyingyuansheng];
+    for (NSInteger index = 0; index < 7; index ++) {
+        [self fetchData:[self getdate] ch:chArr[index] data:dataArr[index]];
+    }
+//    [self fetchData:[self getdate] ch:@"public_shiguang_jingdianlaoge" data:self.jingdianlaoge];
+//    [self fetchData:[self getdate] ch:@"public_tuijian_rege" data:self.rege];
+//    [self fetchData:[self getdate] ch:@"public_tuijian_chengmingqu" data:self.chengmingqu];
+//    [self fetchData:[self getdate] ch:@"public_yuzhong_oumei" data:self.oumei];
+//    [self fetchData:[self getdate] ch:@"public_tuijian_wangluo" data:self.wangluo];
+//    [self fetchData:[self getdate] ch:@"public_tuijian_suibiantingting" data:self.suibiantingting];
+//    [self fetchData:[self getdate] ch:@"public_fengge_dianyingyuansheng" data:self.dianyingyuansheng];
 }
 
 - (void)reloadRadio:(NSString *)radioName{
     [KVNProgress showWithStatus:@"电台重载中..."];
     self.reload = YES;
     [self fetchData:[self getdate] ch:radioName data:self.jingdianlaoge];
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(5 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+        [KVNProgress dismiss];
+        UIAlertView *al = [[UIAlertView alloc] initWithTitle:@"提示" message:@"重载失败" delegate:self cancelButtonTitle:@"确定" otherButtonTitles:nil, nil];
+        [al show];
+    });
 }
 
 #pragma mark - iCarousel methods
@@ -151,19 +158,21 @@
         
         imageView.contentMode = UIViewContentModeScaleAspectFit;
         imageView.asynchronous = YES;
-        imageView.reflectionScale = 0.2f;
-        imageView.reflectionAlpha = 0.25f;
-        imageView.reflectionGap = 10.0f;
-        imageView.shadowOffset = CGSizeMake(0.0f, 2.0f);
-        imageView.shadowBlur = 5.0f;
-        imageView.cornerRadius = SCREEN_WIDTH * 0.7 /2;
+        //倒影
+        imageView.reflectionScale = 0.5f;
+        imageView.reflectionAlpha = 0.20f;
+        imageView.reflectionGap = 20.0f;//倒影距离原物体的距离
+        //投影
+        imageView.shadowOffset = CGSizeMake(0.0f, 1.0f);
+        imageView.shadowBlur = 6.0f;
+        imageView.cornerRadius = SCREEN_WIDTH * 0.7 /1;
         view = imageView;
         
-        UIImageView *imageView0 = [[UIImageView alloc] initWithFrame:CGRectMake(0, 0, SCREEN_WIDTH * 0.7, SCREEN_WIDTH * 0.7)];
-        imageView0.center = view.center;
-        imageView0.layer.cornerRadius = SCREEN_WIDTH * 0.7 /2;
-        imageView0.image = [UIImage imageNamed:self.radioPic[index]];
-        [view addSubview:imageView0];
+//        UIImageView *imageView0 = [[UIImageView alloc] initWithFrame:CGRectMake(0, 0, SCREEN_WIDTH * 0.7, SCREEN_WIDTH * 0.7)];
+//        imageView0.center = view.center;
+//        imageView0.layer.cornerRadius = SCREEN_WIDTH * 0.7 /2;
+//        imageView0.image = [UIImage imageNamed:self.radioPic[index]];
+//        [view addSubview:imageView0];
         
         imageView.tag = [self.tag[index] integerValue];
         self.label = [[UILabel alloc] initWithFrame:CGRectMake(10, 10, 100, 30)];
@@ -172,7 +181,7 @@
         [imageView addSubview:self.label];
     }
     
-    //((FXImageView *)view).image = [UIImage imageNamed:self.radioPic[index]];
+    ((FXImageView *)view).image = [UIImage imageNamed:self.radioPic[index]];
     return view;
 
 }
@@ -268,7 +277,7 @@
     NSDateFormatter *format = [[NSDateFormatter alloc] init];
     format.dateFormat = @"HH";
     NSString *formatDate = [format stringFromDate:[NSDate date]];
-    NSLog(@"%@", formatDate);
+    NSLog(@"现在几点钟:%@", formatDate);
     return formatDate;
 }
 
@@ -287,7 +296,9 @@
         }
         i++; j++;
         [self loadSongList:arr songData:songList];
+        NSLog(@"第%d次加载数据完成", i);
         if (i == 7) {
+            NSLog(@"全部数据加载完成");
             [KVNProgress dismiss];
         } else if (j == 1 && self.reload) {
             [KVNProgress dismiss];
