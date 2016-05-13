@@ -37,6 +37,8 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     [self customUI];
+    [self setupBaseKVNProgressUI];
+    [KVNProgress showWithStatus:@"歌单初始化加载中..."];
     self.page = 1;
     self.dataSource = [[NSMutableArray alloc] init];
     self.songData = [[NSMutableArray alloc] init];
@@ -46,6 +48,7 @@
     [self createRefreshFootView];
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(5 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
         if (self.dataSource.count == 0) {
+            [KVNProgress dismiss];
             [self addTempView];
         }
     });
@@ -197,6 +200,7 @@
 
 - (void)fetchData:(NSInteger)page{
     [[NetDataEngine sharedInstance] GET:[NSString stringWithFormat:URL_SONG, self.page] success:^(id responsData) {
+        [KVNProgress dismiss];
         if (self.page == 1) {
             [self.dataSource removeAllObjects];
         }

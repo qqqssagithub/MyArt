@@ -176,6 +176,7 @@
                 <constraint firstItem="TxW-cu-dY6" firstAttribute="centerY" secondItem="7Om-vM-d0z" secondAttribute="centerY" id="vMe-h8-jD0"/>
                 <constraint firstItem="K5D-x2-fmH" firstAttribute="height" secondItem="tvj-qC-epg" secondAttribute="height" id="xMk-Yf-6jl"/>
             </constraints>
+            <simulatedScreenMetrics key="simulatedDestinationMetrics" type="retina4"/>
             <variation key="default">
                 <mask key="subviews">
                     <exclude reference="7Om-vM-d0z"/>

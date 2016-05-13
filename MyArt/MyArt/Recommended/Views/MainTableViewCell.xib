@@ -49,7 +49,7 @@
                     <constraint firstAttribute="bottomMargin" secondItem="d78-6P-Uif" secondAttribute="bottom" constant="-9" id="z19-WR-iB1"/>
                 </constraints>
             </tableViewCellContentView>
-            <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+            <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
             <connections>
                 <outlet property="author" destination="a2N-A8-uTN" id="hpN-ND-Qus"/>
                 <outlet property="title" destination="T0r-ZH-J0D" id="2D5-uH-90G"/>

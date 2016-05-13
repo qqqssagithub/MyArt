@@ -17,8 +17,9 @@
 #import "SearchModel.h"
 #import "LrcTableViewCell.h"
 #import "SongDetail.h"
+#import "MostColor.h"
 
-#define URL_SEARCH @"http://tingapi.ting.baidu.com/v1/restserver/ting?method=baidu.ting.search.merge&query=%@&page_size=15&page_no=1&type=-1&format=json&from=ios&version=5.5.1&from=ios&channel=appstore"
+
 @interface ViewController () <UITableViewDataSource, UITableViewDelegate, UISearchBarDelegate>
 
 @property (weak, nonatomic) IBOutlet UIButton *mine;
@@ -43,6 +44,10 @@
 @property (weak, nonatomic) IBOutlet UIView *imageV;
 @property (weak, nonatomic) IBOutlet UIImageView *starImgV;
 @property (weak, nonatomic) IBOutlet UITableView *lrcTableView;
+@property (weak, nonatomic) IBOutlet UITableView *ListTableView;
+@property (weak, nonatomic) IBOutlet UIView *topTempBackView;
+
+@property (nonatomic) UIView *playPointTempView;
 
 
 @property (nonatomic) UIView *headerView;
@@ -384,6 +389,9 @@ typedef NS_ENUM(NSInteger, CirculationMode) {
         [weakSelf.queuePlayer pause];
         [weakSelf removePlayingStateKVO];
         [weakSelf openPlayViewWithCell];
+        [weakSelf.ListTableView reloadData];
+        [weakSelf.ListTableView scrollToRowAtIndexPath:[NSIndexPath indexPathForRow:0 inSection:0] atScrollPosition:UITableViewScrollPositionMiddle animated:YES];
+        [weakSelf.ListTableView selectRowAtIndexPath:[NSIndexPath indexPathForRow:0 inSection:0] animated:NO scrollPosition:UITableViewScrollPositionNone];
         dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1.3 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
             [weakSelf cuntomSongList:tag];
         });
@@ -401,12 +409,18 @@ typedef NS_ENUM(NSInteger, CirculationMode) {
     __weak typeof(self) weakSelf = self;
     oneVC.loadMusic = ^(NSMutableArray *data){
         weakSelf.dataSource = data;
-        _tableView = [[UITableView alloc] initWithFrame:CGRectMake(SCREEN_WIDTH, 0, SCREEN_WIDTH, SCREEN_HEIGHT)];
+        if (weakSelf.tableView != nil) {
+            [weakSelf.tableView removeFromSuperview];
+            weakSelf.tableView = nil;
+        }
+        weakSelf.tableView = [[UITableView alloc] initWithFrame:CGRectMake(SCREEN_WIDTH, 0, SCREEN_WIDTH, SCREEN_HEIGHT)];
         weakSelf.tableView.delegate = weakSelf;
         weakSelf.tableView.dataSource = weakSelf;
+        weakSelf.tableView.separatorStyle = UITableViewCellSelectionStyleNone;
         [weakSelf.view addSubview:weakSelf.tableView];
         [weakSelf.view bringSubviewToFront:weakSelf.playPointView];
         
+        [weakSelf.ListTableView reloadData];
         [weakSelf.tableView registerNib:[UINib nibWithNibName:@"MainTableViewCell" bundle:nil] forCellReuseIdentifier:@"xxx"];
 //        weakSelf.left.constant = 30.0;
 //        weakSelf.top.constant = 30.0;
@@ -610,6 +624,13 @@ typedef NS_ENUM(NSInteger, CirculationMode) {
     _lrcTableView.tableHeaderView = view;
     _lrcTableView.tableFooterView = view;
     
+    [_ListTableView registerNib:[UINib nibWithNibName:@"MainTableViewCell" bundle:nil] forCellReuseIdentifier:@"xxx"];
+    //_ListTableView.backgroundColor = [UIColor colorWithPatternImage:[UIImage imageNamed:@"b.png"]];
+    _ListTableView.backgroundColor = [UIColor clearColor];
+    _ListTableView.showsVerticalScrollIndicator = NO;
+    _ListTableView.separatorStyle = UITableViewCellSelectionStyleNone;
+    
+    
     self.progressView.tintColor=[UIColor whiteColor];
     self.progressView.trackTintColor=[UIColor grayColor];
     self.progressView.progress = 0.0;
@@ -660,8 +681,35 @@ typedef NS_ENUM(NSInteger, CirculationMode) {
 - (void)movePlayPointView{
     [UIView animateWithDuration:0.3 animations:^{
         self.playPointView.center = self.tempPoint;
+    } completion:^(BOOL finished) {
+        if (![[NSUserDefaults standardUserDefaults] boolForKey:@"playPointTempIsShow"]) {
+            _playPointTempView = [[UIView alloc] initWithFrame:CGRectMake(0, SCREEN_HEIGHT -1000, 500, 1000)];
+            _playPointTempView.backgroundColor = [UIColor colorWithPatternImage:[UIImage imageNamed:@"playPointTemp"]];
+            [self.view addSubview:_playPointTempView];
+            UILabel *label = [[UILabel alloc] initWithFrame:CGRectMake(15 +50 +15 +12, 1000 -49 -15 -25 -20, SCREEN_WIDTH, 70)];
+            label.numberOfLines = 3;
+            label.textColor = [UIColor whiteColor];
+            label.text = @"<- 这个圆点挡住其他东西了?\n     那就移动它丢到别处去\n     点击屏幕提示消失";
+            [_playPointTempView addSubview:label];
+            
+            [[NSUserDefaults standardUserDefaults] setBool:YES forKey:@"playPointTempIsShow"];
+            
+            UITapGestureRecognizer * tapGR=[[UITapGestureRecognizer alloc]initWithTarget:self action:@selector(playPointTempViewTapGR:)];
+            [_playPointTempView addGestureRecognizer:tapGR];
+            
+        }
     }];
     self.playPointView.userInteractionEnabled = YES;
+}
+
+-(void)playPointTempViewTapGR:(UITapGestureRecognizer *)tapGR{
+    //添加移动手势
+    UIPanGestureRecognizer * panGR=[[UIPanGestureRecognizer alloc]initWithTarget:self action:@selector(panGR:)];
+    [self.playPointView addGestureRecognizer:panGR];
+    
+    
+    [_playPointTempView removeFromSuperview];
+    _playPointTempView = nil;
 }
 
 #pragma mark - 添加播放控制点
@@ -683,16 +731,13 @@ typedef NS_ENUM(NSInteger, CirculationMode) {
     //添加点击手势
     UITapGestureRecognizer * tapGR=[[UITapGestureRecognizer alloc]initWithTarget:self action:@selector(tapGR:)];
     [self.playPointView addGestureRecognizer:tapGR];
-    
-    //添加移动手势
-    UIPanGestureRecognizer * panGR=[[UIPanGestureRecognizer alloc]initWithTarget:self action:@selector(panGR:)];
-    [self.playPointView addGestureRecognizer:panGR];
 }
 
 //点击手势
 -(void)tapGR:(UITapGestureRecognizer *)tapGR{
     [self.view bringSubviewToFront:self.playPointView];
-    if (self.dataSource.count == 0 && self.searchDate.count == 0 && self.SongArray.count == 0) {
+    //NSLog(@"%d, %d, %d", self.dataSource.count, self.searchDate.count, self.SongArray.count);
+    if (self.dataSource.count == 0 && self.searchDate.count == 0) {
         [_tempAlertView show];
         return;
     }
@@ -869,14 +914,15 @@ typedef NS_ENUM(NSInteger, CirculationMode) {
 
 //刷新歌曲名称等信息
 - (void)currentMusicIndexInfo{
+    _topTempBackView.alpha = 0.0;
     if (self.IS_LIKEOPEN) {
         self.songLabel.text = self.oneSongDetail.title;
-        if (self.oneSong.album_title.length != 0) {
-            self.author.text = [NSString stringWithFormat:@"%@ - %@", self.oneSong.author, self.oneSong.album_title];
+        if (self.oneSongDetail.album_title.length != 0) {
+            self.author.text = [NSString stringWithFormat:@"%@ - %@", self.oneSongDetail.author, self.oneSongDetail.album_title];
         } else {
-            self.author.text = [NSString stringWithFormat:@"%@", self.oneSong.author];
+            self.author.text = [NSString stringWithFormat:@"%@", self.oneSongDetail.author];
         }
-        [self.starImgV sd_setImageWithURL:[NSURL URLWithString:self.oneSongDetail.pic_radio]];
+        //[self.starImgV sd_setImageWithURL:[NSURL URLWithString:self.oneSongDetail.pic_radio]];
     } else {
         self.songLabel.text = self.oneSong.title;
         if (self.oneSong.album_title.length != 0) {
@@ -885,53 +931,70 @@ typedef NS_ENUM(NSInteger, CirculationMode) {
             self.author.text = [NSString stringWithFormat:@"%@", self.oneSong.author];
         }
         
-        [self.starImgV sd_setImageWithURL:[NSURL URLWithString:self.oneSong.pic_radio]];
+        //[self.starImgV sd_setImageWithURL:[NSURL URLWithString:self.oneSong.pic_radio]];
     }
     
     [self backImage];
-    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-        [self backImage];
-    });
-    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(2 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-        [self backImage];
-    });
-    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(3 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-        [self backImage];
-    });
-    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(4 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-        [self backImage];
-    });
+//    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+//        [self backImage];
+//    });
+//    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(2 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+//        [self backImage];
+//    });
+//    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(3 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+//        [self backImage];
+//    });
+//    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(4 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+//        [self backImage];
+//    });
 }
 
 - (void)backImage{
+    NSString *imageKey;
     if (self.IS_LIKEOPEN) {
-        UIImage *tempImage = [[SDImageCache sharedImageCache] imageFromDiskCacheForKey:self.oneSongDetail.pic_radio];
-        //dispatch_async(dispatch_queue_create("queue", NULL), ^ {
-            if (tempImage == nil) {
-                //dispatch_async(dispatch_get_main_queue(), ^{
-                    self.playViewBackImageView.image = [self blurryImage:[UIImage imageNamed:@"bg"] withBlurLevel: 0.9];
-                //});
-                self.starImgV.image = [UIImage imageNamed:@"bg"];
-            } else {
-                //dispatch_async(dispatch_get_main_queue(), ^{
-                    self.playViewBackImageView.image = [self blurryImage:tempImage withBlurLevel: 0.9];
-                //});
-            }
-        //});
+        imageKey = self.oneSongDetail.pic_radio;
     } else {
-        UIImage *tempImage = [[SDImageCache sharedImageCache] imageFromDiskCacheForKey:self.oneSong.pic_radio];
-       // dispatch_async(dispatch_queue_create("queue", NULL), ^ {
-            if (tempImage == nil) {
-               // dispatch_async(dispatch_get_main_queue(), ^{
-                    self.playViewBackImageView.image = [self blurryImage:[UIImage imageNamed:@"bg"] withBlurLevel: 0.9];
-                //});
-                self.starImgV.image = [UIImage imageNamed:@"bg"];
-            } else {
-                //dispatch_async(dispatch_get_main_queue(), ^{
-                    self.playViewBackImageView.image = [self blurryImage:tempImage withBlurLevel: 0.9];
-               // });
-            }
-        //});
+        imageKey = self.oneSong.pic_radio;
+    }
+    UIImage *tempImage = [[SDImageCache sharedImageCache] imageFromDiskCacheForKey:imageKey];
+    if (tempImage == nil) {
+        self.playViewBackImageView.image = [self blurryImage:[UIImage imageNamed:@"bg"] withBlurLevel: 0.9];
+        self.starImgV.image = [UIImage imageNamed:@"bg"];
+        [[SDWebImageManager sharedManager] downloadImageWithURL:[NSURL URLWithString:imageKey] options:0 progress:^(NSInteger receivedSize, NSInteger expectedSize) {
+                //这里是处理下载进度
+            } completed:^(UIImage *image, NSError *error, SDImageCacheType cacheType, BOOL finished, NSURL *imageURL) {
+                if (image) {//下载完成后
+                    self.starImgV.image = image;
+                    self.playViewBackImageView.image = [self blurryImage:image withBlurLevel: 0.9];
+                    
+                    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+                        // 耗时的操作
+                        BOOL isWhite = [[[MostColor alloc] init] mostColor:image];
+                        dispatch_async(dispatch_get_main_queue(), ^{
+                            // 更新界面
+                            if (isWhite) {
+                                _topTempBackView.alpha = 1.0;
+                            }
+                        });  
+                    });
+                    
+                    
+                }
+            }];
+    } else {
+        self.starImgV.image = tempImage;
+        self.playViewBackImageView.image = [self blurryImage:tempImage withBlurLevel: 0.9];
+        
+        dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+            // 耗时的操作
+            BOOL isWhite = [[[MostColor alloc] init] mostColor:tempImage];
+            dispatch_async(dispatch_get_main_queue(), ^{
+                // 更新界面
+                if (isWhite) {
+                    _topTempBackView.alpha = 1.0;
+                }
+            });
+        });
     }
 }
 
@@ -1073,6 +1136,7 @@ typedef NS_ENUM(NSInteger, CirculationMode) {
 
 - (void)changeAlpha{
     self.playView.alpha = 1.0;
+    [self.queuePlayer play];
 }
 
 
@@ -1097,7 +1161,23 @@ typedef NS_ENUM(NSInteger, CirculationMode) {
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath{
     if (tableView == self.tableView) {
-        MainTableViewCell *cell = [self.tableView dequeueReusableCellWithIdentifier:@"xxx" forIndexPath:indexPath];
+        MainTableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"xxx" forIndexPath:indexPath];
+        if (self.IS_SEARCHING) {
+            SearchModel *searchModel = [self.searchDate objectAtIndex:indexPath.row];
+            [cell updateWithSearchModel:searchModel];
+        } else if (self.IS_LIKE) {
+            SongDetail *oneSongDetail = [self.SongArray objectAtIndex:indexPath.row];
+            [cell updateWithSongDetail:oneSongDetail];
+        } else {
+            SongModel *songModel = [self.dataSource objectAtIndex:indexPath.row];
+            [cell updateWithModel:songModel];
+        }
+        return cell;
+    }
+    
+    if (tableView == _ListTableView) {
+        MainTableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"xxx" forIndexPath:indexPath];
+        //cell.backgroundColor = [UIColor colorWithRed:0.16 green:0.72 blue:1.0 alpha:0.1];
         if (self.IS_SEARCHING) {
             SearchModel *searchModel = [self.searchDate objectAtIndex:indexPath.row];
             [cell updateWithSearchModel:searchModel];
@@ -1153,7 +1233,7 @@ typedef NS_ENUM(NSInteger, CirculationMode) {
 //转跳播放页面
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath{
     if (self.IS_LIKEOPEN && self.IS_LIKE) {
-        if ([((SongDetail *)self.SongArray[indexPath.row]).song_id isEqualToString:self.oneSongDetail.song_id] && self.oneSong != nil) {
+        if ([((SongDetail *)self.SongArray[indexPath.row]).song_id isEqualToString:self.oneSongDetail.song_id] && self.oneSongDetail != nil) {
             [self openPlayViewWithCell];
             return;
         }
@@ -1171,6 +1251,15 @@ typedef NS_ENUM(NSInteger, CirculationMode) {
         return;
     }
     [self removePlayingStateKVO];
+    
+    [_ListTableView scrollToRowAtIndexPath:[NSIndexPath indexPathForRow:indexPath.row inSection:0] atScrollPosition:UITableViewScrollPositionMiddle animated:YES];
+    if (tableView == _ListTableView) {
+        [self cuntomSongList:indexPath.row];
+        return;
+    } else {
+        [_ListTableView selectRowAtIndexPath:[NSIndexPath indexPathForRow:indexPath.row inSection:0] animated:NO scrollPosition:UITableViewScrollPositionNone];
+    }
+    
     [self openPlayViewWithCell];
     if (self.IS_SEARCHING) {
         [self.view endEditing:YES];
@@ -1244,6 +1333,7 @@ typedef NS_ENUM(NSInteger, CirculationMode) {
             [self.playerItems addObject:item];
         }
         self.oneSongDetail = self.SongArray[index];
+        
         [self loadMusic:index];
     }
 }
@@ -1266,6 +1356,7 @@ typedef NS_ENUM(NSInteger, CirculationMode) {
 }
 
 //删除监听
+#pragma mark - 删除监听
 - (void)removePlayingStateKVO{
     for (NSInteger index = 0; index < self.playerItems.count; index++) {
         AVPlayerItem *item = self.playerItems[index];
@@ -1287,14 +1378,19 @@ typedef NS_ENUM(NSInteger, CirculationMode) {
     _searchBar = [[UISearchBar alloc] initWithFrame:CGRectMake(SCREEN_WIDTH, 20, SCREEN_WIDTH, 44)];
     _searchDate = [[NSMutableArray alloc] init];
     _searchBar.delegate=self;
-    _searchBar.placeholder = @"歌名 歌手";
+    _searchBar.placeholder = @"请输入搜索内容";
     [_searchBar becomeFirstResponder];
     _searchBar.showsCancelButton = YES;
     self.IS_SEARCHING = YES;
     
+    if (_tableView != nil) {
+        [_tableView removeFromSuperview];
+        _tableView = nil;
+    }
     _tableView = [[UITableView alloc] initWithFrame:CGRectMake(0, SCREEN_HEIGHT, SCREEN_WIDTH, SCREEN_HEIGHT - 64)];
     _tableView.dataSource = self;
     _tableView.delegate = self;
+    _tableView.separatorStyle = UITableViewCellSelectionStyleNone;
     [self.view addSubview:_tableView];
     [_tableView registerNib:[UINib nibWithNibName:@"MainTableViewCell" bundle:nil] forCellReuseIdentifier:@"xxx"];
     [self.view bringSubviewToFront:self.playPointView];
@@ -1311,6 +1407,7 @@ typedef NS_ENUM(NSInteger, CirculationMode) {
     [[NetDataEngine sharedInstance] GET:url success:^(id responsData) {
         _searchDate = [SearchModel parseRespondsData:responsData];
         [_tableView reloadData];
+        [self.ListTableView reloadData];
     } failed:^(NSError *error) {
         NSLog(@"%@", error);
     }];
@@ -1405,12 +1502,17 @@ typedef NS_ENUM(NSInteger, CirculationMode) {
 
 #pragma mark - Lrc
 - (IBAction)hiddenLrc:(id)sender {
-    if (self.lrcTableView.alpha == 0.0) {
-        self.lrcTableView.alpha = 1.0;
+    if (self.ListTableView.alpha == 1.0) {
+        self.ListTableView.alpha = 0.0;
+    }
+    if ([self.hiddenLrcButton.titleLabel.text isEqualToString:@"词"]) {
         self.imageV.alpha = 0.0;
+        self.lrcTableView.alpha = 1.0;
+        [self.hiddenLrcButton setTitle:@"图" forState:UIControlStateNormal];
     } else {
         self.lrcTableView.alpha = 0.0;
         self.imageV.alpha = 1.0;
+        [self.hiddenLrcButton setTitle:@"词" forState:UIControlStateNormal];
     }
 }
 
@@ -1450,6 +1552,22 @@ typedef NS_ENUM(NSInteger, CirculationMode) {
     _tempView = [[UIView alloc] initWithFrame:CGRectMake(0, 64, self.view.bounds.size.width, self.view.bounds.size.width)];
     _tempView.backgroundColor = [UIColor clearColor];
     return _tempView;
+}
+
+
+- (IBAction)hideList:(id)sender {
+    if (self.ListTableView.alpha == 0.0) {
+        self.ListTableView.alpha = 1.0;
+        self.imageV.alpha = 0.0;
+        self.lrcTableView.alpha = 0.0;
+    } else {
+        self.ListTableView.alpha = 0.0;
+        if ([self.hiddenLrcButton.titleLabel.text isEqualToString:@"词"]) {
+            self.imageV.alpha = 1.0;
+        } else {
+            self.lrcTableView.alpha = 1.0;
+        }
+    }
 }
 
 #pragma mark - collectionButton
@@ -1493,6 +1611,7 @@ typedef NS_ENUM(NSInteger, CirculationMode) {
         self.SongArray = [SongDetail MR_findAll];
         if (self.IS_LIKEOPEN) {
             [self.tableView reloadData];
+            [self.ListTableView reloadData];
         }
     }];
     [downloadTask resume];
@@ -1506,6 +1625,7 @@ typedef NS_ENUM(NSInteger, CirculationMode) {
     self.SongArray = [SongDetail MR_findAll];
     if (self.IS_LIKEOPEN) {
         [self.tableView reloadData];
+        [self.ListTableView reloadData];
     }
     NSLog(@"取消收藏");
 }
@@ -1513,26 +1633,24 @@ typedef NS_ENUM(NSInteger, CirculationMode) {
 - (IBAction)like:(id)sender {
     [self addTableViewWhitTitle:@"我的收藏"];
     self.IS_LIKE = YES;
+    [self.ListTableView reloadData];
 }
 
 - (void)addTableViewWhitTitle:(NSString *)title{
     self.SongArray = [SongDetail MR_findAll];
+    
+    if (_tableView != nil) {
+        [_tableView removeFromSuperview];
+        _tableView = nil;
+    }
     _tableView = [[UITableView alloc] initWithFrame:CGRectMake(SCREEN_WIDTH, 0, SCREEN_WIDTH, SCREEN_HEIGHT)];
     self.tableView.delegate = self;
     self.tableView.dataSource = self;
+    self.tableView.separatorStyle = UITableViewCellSelectionStyleNone;
     [self.view addSubview:self.tableView];
     [self.view bringSubviewToFront:self.playPointView];
     
     [self.tableView registerNib:[UINib nibWithNibName:@"MainTableViewCell" bundle:nil] forCellReuseIdentifier:@"xxx"];
-//    self.left.constant = 30.0;
-//    self.top.constant = 30.0;
-//    self.bottom.constant = 30.0;
-//    self.right.constant = 30.0;
-//    [UIView animateWithDuration:0.5 animations:^{
-//        self.baseView.alpha = 0.5;
-//        [self.baseView layoutIfNeeded];
-//        self.tableView.frame = CGRectMake(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
-//    }];
     CGAffineTransform newTransform =
     CGAffineTransformScale([UIApplication sharedApplication].keyWindow.transform, 0.7, 0.7);
     [UIView animateWithDuration:0.4 animations:^{

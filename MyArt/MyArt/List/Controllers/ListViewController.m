@@ -38,18 +38,8 @@
     [super viewDidLoad];
     self.view.backgroundColor = [UIColor lightGrayColor];
     
-    UILabel *backLabel = [[UILabel alloc] initWithFrame:CGRectMake(0, 12, SCREEN_WIDTH, 48)];
-    backLabel.numberOfLines = 3;
-    //backLabel.autoresizingMask = UIViewAutoresizingFlexibleWidth;
-    backLabel.font = [UIFont boldSystemFontOfSize:13];
-    //backLabel.textColor = [UIColor colorWithRed:150.0/255 green:150.0/255 blue:150.0/255 alpha:1];
-    backLabel.textColor = [UIColor whiteColor];
-    backLabel.backgroundColor = [UIColor clearColor];
-    backLabel.textAlignment = NSTextAlignmentCenter;
-    backLabel.text = @"APP所有音乐资源均取自百度音乐\n仅作为分享用\n不用于任何商业目的";
-    [self.view addSubview:backLabel];
+    [self addBackLabel];
 
-    
     self.songData = [[NSMutableArray alloc] init];
     self.songList = [[NSMutableArray alloc] init];
     [self cunstomUI];
@@ -58,11 +48,33 @@
     self.pic = @[@"新歌.jpg", @"热歌.jpg", @"欧美.jpg", @"king.jpg", @"原创.jpg", @"华语.jpg", @"金典.jpg", @"网络.jpg", @"影视.jpg", @"对唱.jpg", @"bi.jpg", @"摇滚.jpg", @"ktv.jpg", @"cc.jpg",];
     
     [self setupBaseKVNProgressUI];//
+    [KVNProgress showWithStatus:@"榜单初始化加载中..."];
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(5 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
         if (self.dataSource.count == 0) {
             [self addTempView];
         }
     });
+}
+
+- (void)addBackLabel {
+    UILabel *backLabel = [[UILabel alloc] initWithFrame:CGRectMake(0, 12, SCREEN_WIDTH, 48)];
+    backLabel.numberOfLines = 3;
+    backLabel.font = [UIFont boldSystemFontOfSize:13];
+    backLabel.textColor = [UIColor whiteColor];
+    backLabel.backgroundColor = [UIColor clearColor];
+    backLabel.textAlignment = NSTextAlignmentCenter;
+    backLabel.text = @"APP所有音乐资源均取自百度音乐\n仅作为分享用\n不用于任何商业目的";
+    [self.view addSubview:backLabel];
+    
+    UILabel *backLabel0 = [[UILabel alloc] initWithFrame:CGRectMake(0, SCREEN_HEIGHT -2 -48 -49 -64, SCREEN_WIDTH, 48)];
+    backLabel0.numberOfLines = 3;
+    backLabel0.font = [UIFont boldSystemFontOfSize:13];
+    backLabel0.textColor = [UIColor whiteColor];
+    backLabel0.backgroundColor = [UIColor clearColor];
+    backLabel0.textAlignment = NSTextAlignmentCenter;
+    backLabel0.text = @"此项目为开源项目\n源代码由\"qqqssa\"提供\nhttps://github.com/qqqssagithub/MyArt.git";
+    [self.view addSubview:backLabel0];
+    
 }
 
 - (void)addTempView{
@@ -91,6 +103,7 @@
     }
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(5 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
         if (self.dataSource.count == 0) {
+            [KVNProgress dismiss];
             [self addTempView];
         }
     });
@@ -122,6 +135,7 @@
 
 - (void)fetchData{
     [[NetDataEngine sharedInstance] GET:URL_LIST success:^(id responsData) {
+        [KVNProgress dismiss];
         self.dataSource = [ListModel parseRespondsData:responsData];
         [self.tableView reloadData];
     } failed:^(NSError *error) {

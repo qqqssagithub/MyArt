@@ -29,6 +29,8 @@
 @property (nonatomic) NSMutableArray *songList;
 
 @property (nonatomic, retain) DBSphereView *sphereView;
+@property (nonatomic) UIView *topImageViewTemp;
+//@property (nonatomic) UIView *sphereViewTemp;
 
 @property (nonatomic) NetworkRefreshFailedView *networkRefreshFailedView;
 
@@ -55,6 +57,7 @@
     self.loadButton.enabled = NO;
     [self fetchData];
     _networkRefreshFailedView = nil;
+    [self setupBaseKVNProgressUI];
 }
 
 
@@ -93,6 +96,20 @@
     [_topImageView sd_setImageWithURL:[self.dataSource lastObject][@"pic_w700"]];
     [UIView animateWithDuration:0.1 animations:^{
         _topImageView.alpha = 1.0;
+
+        if ([[NSUserDefaults standardUserDefaults] boolForKey:@"topImageViewTempIsShow"] == NO) {
+            _topImageViewTemp = [[UIView alloc] initWithFrame:CGRectMake(0, 0, _topImageView.frame.size.width, _topImageView.frame.size.width)];
+            _topImageViewTemp.backgroundColor = [UIColor colorWithWhite:0.0 alpha:0.4];
+            [_topImageView addSubview:_topImageViewTemp];
+            UIImageView *imgV = [[UIImageView alloc] initWithFrame:CGRectMake(0, 0, 120, 120)];
+            imgV.image = [UIImage imageNamed:@"topImageViewTemp"];
+            imgV.center = _topImageViewTemp.center;
+            [_topImageViewTemp addSubview:imgV];
+            [[NSUserDefaults standardUserDefaults] setBool:YES forKey:@"topImageViewTempIsShow"];
+        }
+        
+        
+
     } completion:^(BOOL finished) {
         UITapGestureRecognizer * tapGR=[[UITapGestureRecognizer alloc]initWithTarget:self action:@selector(tapGR:)];
         [_topImageView addGestureRecognizer:tapGR];
@@ -103,9 +120,41 @@
 }
 
 - (void)tapGR:(UITapGestureRecognizer *)tapGR{
+    if (_topImageViewTemp != nil) {
+        [_topImageViewTemp removeFromSuperview];
+        _topImageViewTemp = nil;
+    }
     [self.view addSubview:self.sphereView];
     self.topImageView.alpha = 0.1;
+    
+//    if ([[NSUserDefaults standardUserDefaults] boolForKey:@"sphereViewTempIsShow"] == NO) {
+//        _sphereViewTemp = [[UIView alloc] initWithFrame:CGRectMake(0, 0, _topImageView.frame.size.width, _topImageView.frame.size.width)];
+//        _sphereViewTemp.backgroundColor = [UIColor colorWithWhite:0.0 alpha:0.4];
+//        [_topImageView addSubview:_sphereViewTemp];
+//        UIImageView *imgV = [[UIImageView alloc] initWithFrame:CGRectMake(0, 0, _topImageView.frame.size.width, _topImageView.frame.size.width)];
+//        imgV.image = [UIImage imageNamed:@"sphereViewTemp"];
+//        [_sphereViewTemp addSubview:imgV];
+//        [[NSUserDefaults standardUserDefaults] setBool:YES forKey:@"sphereViewTempIsShow"];
+//    }
+    
 }
+
+- (void)setupBaseKVNProgressUI
+{
+    // See the documentation of all appearance propoerties
+    [KVNProgress appearance].statusColor = [UIColor darkGrayColor];
+    [KVNProgress appearance].statusFont = [UIFont systemFontOfSize:17.0f];
+    [KVNProgress appearance].circleStrokeForegroundColor = [UIColor darkGrayColor];
+    [KVNProgress appearance].circleStrokeBackgroundColor = [[UIColor darkGrayColor] colorWithAlphaComponent:0.3f];
+    [KVNProgress appearance].circleFillBackgroundColor = [UIColor clearColor];
+    [KVNProgress appearance].backgroundFillColor = [UIColor colorWithWhite:0.9f alpha:0.9f];
+    [KVNProgress appearance].backgroundTintColor = [UIColor whiteColor];
+    [KVNProgress appearance].successColor = [UIColor darkGrayColor];
+    [KVNProgress appearance].errorColor = [UIColor darkGrayColor];
+    [KVNProgress appearance].circleSize = 75.0f;
+    [KVNProgress appearance].lineWidth = 2.0f;
+}
+
 
 #pragma mark - 网络请求
 - (void)fetchData{
@@ -152,14 +201,14 @@
             }
         } failed:^(NSError *error) {
             NSLog(@"%@", error);
-            [self addTempView];
+            //[self addTempView];
         }];
     }
-    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(5 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-        if (self.songList.count != self.dataSource.count - 1) {
-            [self addTempView];
-        }
-    });
+//    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(5 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+//        if (self.songList.count != self.dataSource.count - 1) {
+//            [self addTempView];
+//        }
+//    });
 }
 
 #pragma mark - 加载音乐
@@ -189,7 +238,35 @@
 }
 
 - (void)buttonPressed:(UIButton *)btn{
-    self.loadSong(btn.tag - 4000, self.songList);
+    [KVNProgress showWithStatus:@"精彩内容即将到来..."];
+    NSString *name = btn.titleLabel.text;
+    NSString *tempUrl = [NSString stringWithFormat:URL_SEARCH, name];
+    NSString *url = [tempUrl stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
+    [[NetDataEngine sharedInstance] GET:url success:^(id responsData) {
+        NSMutableArray *dataArr = [SearchModel parseRespondsData:responsData];
+        NSMutableArray *songList = [NSMutableArray array];
+        int j = 0;
+        __block typeof(j) bj = j;
+        for (int i = 0; i < dataArr.count; i++) {
+            [[NetDataEngine sharedInstance] GET:[NSString stringWithFormat:SONG_URL, ((SearchModel *)(dataArr[i])).song_id, SONG_URL_X] success:^(id responsData) {
+                bj++;
+                SongModel *oneSong = [SongModel parseRespondsData:responsData];
+                if (oneSong.songFiles.count != 0) {
+                    [songList addObject:oneSong];
+                }
+                if (bj == dataArr.count) {
+                    self.loadSong(0, songList);
+                    [KVNProgress dismiss];
+                }
+            } failed:^(NSError *error) {
+                NSLog(@"%@", error);
+            }];
+        }
+    } failed:^(NSError *error) {
+        NSLog(@"%@", error);
+    }];
+    
+    //self.loadSong(btn.tag - 4000, self.songList);
 }
 
 - (void)didReceiveMemoryWarning {
