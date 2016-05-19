@@ -696,10 +696,9 @@ typedef NS_ENUM(NSInteger, CirculationMode) {
             
             UITapGestureRecognizer * tapGR=[[UITapGestureRecognizer alloc]initWithTarget:self action:@selector(playPointTempViewTapGR:)];
             [_playPointTempView addGestureRecognizer:tapGR];
-            
         }
+        self.playPointView.userInteractionEnabled = YES;
     }];
-    self.playPointView.userInteractionEnabled = YES;
 }
 
 -(void)playPointTempViewTapGR:(UITapGestureRecognizer *)tapGR{
@@ -731,16 +730,22 @@ typedef NS_ENUM(NSInteger, CirculationMode) {
     //添加点击手势
     UITapGestureRecognizer * tapGR=[[UITapGestureRecognizer alloc]initWithTarget:self action:@selector(tapGR:)];
     [self.playPointView addGestureRecognizer:tapGR];
+    
+    if ([[NSUserDefaults standardUserDefaults] boolForKey:@"playPointTempIsShow"]) {
+        //添加移动手势
+        UIPanGestureRecognizer * panGR=[[UIPanGestureRecognizer alloc]initWithTarget:self action:@selector(panGR:)];
+        [self.playPointView addGestureRecognizer:panGR];
+    }
 }
 
 //点击手势
 -(void)tapGR:(UITapGestureRecognizer *)tapGR{
     [self.view bringSubviewToFront:self.playPointView];
     //NSLog(@"%d, %d, %d", self.dataSource.count, self.searchDate.count, self.SongArray.count);
-    if (self.dataSource.count == 0 && self.searchDate.count == 0) {
-        [_tempAlertView show];
-        return;
-    }
+//    if (self.dataSource.count == 0 && self.searchDate.count == 0) {
+//        [_tempAlertView show];
+//        return;
+//    }
     [self openPlayViewWithCell];
 }
 
