@@ -239,6 +239,29 @@
 
 - (void)buttonPressed:(UIButton *)btn{
     [KVNProgress showWithStatus:@"精彩内容即将到来..."];
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(5 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+        [KVNProgress dismiss];
+        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.5 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+            UIView *backView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT)];
+            backView.backgroundColor = [UIColor colorWithWhite:0.0 alpha:0.3];
+            [[UIApplication sharedApplication].keyWindow addSubview:backView];
+            UIView *whiteView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, SCREEN_WIDTH -48, 44)];
+            whiteView.layer.cornerRadius = 5;
+            whiteView.layer.masksToBounds = YES;
+            whiteView.backgroundColor = [UIColor colorWithWhite:1.0 alpha:0.9];
+            whiteView.center = backView.center;
+            [backView addSubview:whiteView];
+            UILabel *netLabel = [[UILabel alloc] initWithFrame:CGRectMake(0, 12, SCREEN_WIDTH -48, 20)];
+            netLabel.text = @"网络请求失败";
+            netLabel.textAlignment = NSTextAlignmentCenter;
+            netLabel.textColor = [UIColor blackColor];
+            [whiteView addSubview:netLabel];
+            dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(2 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+                [backView removeFromSuperview];
+            });
+        });
+        
+    });
     NSString *name = btn.titleLabel.text;
     NSString *tempUrl = [NSString stringWithFormat:URL_SEARCH, name];
     NSString *url = [tempUrl stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
