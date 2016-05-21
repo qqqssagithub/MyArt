@@ -34,6 +34,7 @@
 @property (nonatomic) UILabel *label;
 
 @property (nonatomic) NSString *tempRadioName;
+@property (nonatomic) NSMutableArray *tempRadioArr;
 @property (nonatomic) BOOL reload;
 
 @end
@@ -61,9 +62,8 @@
     self.carousel.dataSource = self;
     
     //初始化界面时的遮挡视图
-    [self setupBaseKVNProgressUI];
-    [KVNProgress showWithParameters:@{KVNProgressViewParameterStatus: @"电台加载上线中,请稍等...", KVNProgressViewParameterBackgroundType:@(NO)}];
-    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(5 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+    [KVNProgress showWithStatus:@"电台加载上线中,请稍等..."];
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(8 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
         [KVNProgress dismiss];
     });
     
@@ -93,23 +93,6 @@
 }
 
 #pragma mark - UI
-//界面刷新遮挡视图
-- (void)setupBaseKVNProgressUI
-{
-    // See the documentation of all appearance propoerties
-    [KVNProgress appearance].statusColor = [UIColor darkGrayColor];
-    [KVNProgress appearance].statusFont = [UIFont systemFontOfSize:14.0f];
-    [KVNProgress appearance].circleStrokeForegroundColor = [UIColor darkGrayColor];
-    [KVNProgress appearance].circleStrokeBackgroundColor = [[UIColor darkGrayColor] colorWithAlphaComponent:0.3f];
-    [KVNProgress appearance].circleFillBackgroundColor = [UIColor clearColor];
-    [KVNProgress appearance].backgroundFillColor = [UIColor colorWithWhite:0.9f alpha:0.9f];
-    [KVNProgress appearance].backgroundTintColor = [UIColor whiteColor];
-    [KVNProgress appearance].successColor = [UIColor darkGrayColor];
-    [KVNProgress appearance].errorColor = [UIColor darkGrayColor];
-    [KVNProgress appearance].circleSize = 75.0f;
-    [KVNProgress appearance].lineWidth = 2.0f;
-}
-
 
 - (void)loadRadio{
     NSArray *chArr = @[@"public_shiguang_jingdianlaoge", @"public_tuijian_rege", @"public_tuijian_chengmingqu", @"public_yuzhong_oumei", @"public_tuijian_wangluo", @"public_tuijian_suibiantingting", @"public_fengge_dianyingyuansheng"];
@@ -117,23 +100,16 @@
     for (NSInteger index = 0; index < 7; index ++) {
         [self fetchData:[self getdate] ch:chArr[index] data:dataArr[index]];
     }
-//    [self fetchData:[self getdate] ch:@"public_shiguang_jingdianlaoge" data:self.jingdianlaoge];
-//    [self fetchData:[self getdate] ch:@"public_tuijian_rege" data:self.rege];
-//    [self fetchData:[self getdate] ch:@"public_tuijian_chengmingqu" data:self.chengmingqu];
-//    [self fetchData:[self getdate] ch:@"public_yuzhong_oumei" data:self.oumei];
-//    [self fetchData:[self getdate] ch:@"public_tuijian_wangluo" data:self.wangluo];
-//    [self fetchData:[self getdate] ch:@"public_tuijian_suibiantingting" data:self.suibiantingting];
-//    [self fetchData:[self getdate] ch:@"public_fengge_dianyingyuansheng" data:self.dianyingyuansheng];
 }
 
 - (void)reloadRadio:(NSString *)radioName{
     [KVNProgress showWithStatus:@"电台重载中..."];
     self.reload = YES;
     [self fetchData:[self getdate] ch:radioName data:self.jingdianlaoge];
-    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(5 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-        [KVNProgress dismiss];
-        UIAlertView *al = [[UIAlertView alloc] initWithTitle:@"提示" message:@"重载失败" delegate:self cancelButtonTitle:@"确定" otherButtonTitles:nil, nil];
-        [al show];
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(8 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+        if (self.tempRadioArr.count == 0) {
+            [KVNProgress showErrorWithStatus:@"电台重载失败"];
+        }
     });
 }
 
@@ -192,6 +168,7 @@
         case 3000:
             if (self.jingdianlaoge.count == 0) {
                 self.tempRadioName = @"public_shiguang_jingdianlaoge";
+                self.tempRadioArr = self.jingdianlaoge;
                 [self presentViewController:_alertController animated:YES completion:nil];
                 return;
             }
@@ -201,6 +178,7 @@
             if (self.rege.count == 0) {
                 [self presentViewController:_alertController animated:YES completion:nil];
                 self.tempRadioName = @"public_tuijian_rege";
+                self.tempRadioArr = self.rege;
                 return;
             }
             self.openPlayViewBlock(self.rege);
@@ -208,6 +186,7 @@
             break;
         case 3002:
             if (self.chengmingqu.count == 0) {
+                self.tempRadioArr = self.chengmingqu;
                 [self presentViewController:_alertController animated:YES completion:nil];
                 self.tempRadioName = @"public_tuijian_chengmingqu";
                 return;
@@ -217,6 +196,7 @@
             break;
         case 3003:
             if (self.oumei.count == 0) {
+                self.tempRadioArr = self.oumei;
                 [self presentViewController:_alertController animated:YES completion:nil];
                 self.tempRadioName = @"public_yuzhong_oumei";
                 return;
@@ -226,6 +206,7 @@
             break;
         case 3004:
             if (self.wangluo.count == 0) {
+                self.tempRadioArr = self.wangluo;
                 [self presentViewController:_alertController animated:YES completion:nil];
                 self.tempRadioName = @"public_tuijian_wangluo";
                 return;
@@ -235,6 +216,7 @@
             break;
         case 3005:
             if (self.suibiantingting.count == 0) {
+                self.tempRadioArr = self.suibiantingting;
                 [self presentViewController:_alertController animated:YES completion:nil];
                 self.tempRadioName = @"public_tuijian_suibiantingting";
                 return;
@@ -244,6 +226,7 @@
             break;
         case 3006:
             if (self.dianyingyuansheng.count == 0) {
+                self.tempRadioArr = self.dianyingyuansheng;
                 [self presentViewController:_alertController animated:YES completion:nil];
                 self.tempRadioName = @"public_fengge_dianyingyuansheng";
                 return;

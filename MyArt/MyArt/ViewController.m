@@ -18,42 +18,27 @@
 #import "LrcTableViewCell.h"
 #import "SongDetail.h"
 #import "MostColor.h"
+#import "UIImage+blur.h"
 
 
 @interface ViewController () <UITableViewDataSource, UITableViewDelegate, UISearchBarDelegate>
 
-@property (weak, nonatomic) IBOutlet UIButton *mine;
-@property (nonatomic) NSArray *SongArray;
-@property (nonatomic) BOOL IS_LIKE;
-@property (nonatomic) BOOL IS_LIKEOPEN;
-@property (nonatomic) SongDetail *oneSongDetail;
-@property (nonatomic) NSArray *songs;
+#pragma mark - 收藏
+@property (weak, nonatomic) IBOutlet UIButton *mine;                         //打开收藏的按钮(title:最爱);
+@property (nonatomic) NSArray *SongArray;                                    //收藏列表数据数组
+@property (nonatomic) BOOL IS_LIKE;                                          //记录开始播放收藏的歌曲
+@property (nonatomic) BOOL IS_LIKEOPEN;                                      //收藏界面是否打开
+@property (nonatomic) SongDetail *oneSongDetail;                             //收藏的歌曲数据库文件
+@property (nonatomic) NSArray *songs;                                        //去匹配是否已经收藏的列表
 
-@property (weak, nonatomic) IBOutlet UIButton *search;
-@property (weak, nonatomic) IBOutlet UILabel *infoLabel;
-@property (nonatomic) BOOL IS_SEARCHING;
-@property (weak, nonatomic) IBOutlet UIButton *cancelButton;
-@property (weak, nonatomic) IBOutlet NSLayoutConstraint *cancelButtonWidth;
-
+#pragma mark - search
+@property (weak, nonatomic) IBOutlet UIButton *search;                       //搜索按钮
+@property (nonatomic) BOOL IS_SEARCHING;                                     //记录是否在进行搜索
+@property (weak, nonatomic) IBOutlet UIButton *cancelButton;                 //取消按钮
+@property (weak, nonatomic) IBOutlet NSLayoutConstraint *cancelButtonWidth;  //取消按钮的右边距
+@property (nonatomic) NSInteger searchIndex;                                 //记录点击了搜索列表中的那一行
 @property (nonatomic) UISearchBar *searchBar;
-@property (nonatomic) NSMutableArray *searchDate;
-
-@property (weak, nonatomic) IBOutlet UIImageView *playViewBackImageView;
-@property (weak, nonatomic) IBOutlet UILabel *songLabel;
-@property (weak, nonatomic) IBOutlet UILabel *author;
-@property (weak, nonatomic) IBOutlet UIView *imageV;
-@property (weak, nonatomic) IBOutlet UIImageView *starImgV;
-@property (weak, nonatomic) IBOutlet UITableView *lrcTableView;
-@property (weak, nonatomic) IBOutlet UITableView *ListTableView;
-@property (weak, nonatomic) IBOutlet UIView *topTempBackView;
-
-@property (nonatomic) UIView *playPointTempView;
-
-
-@property (nonatomic) UIView *headerView;
-@property (nonatomic) UIImageView *imageView;
-@property (nonatomic) UILabel *headerLabel;
-
+@property (nonatomic) NSMutableArray *searchDate;                            //搜索列表数据数组
 
 #pragma mark - baseView
 @property (weak, nonatomic) IBOutlet UIView *baseView;
@@ -68,70 +53,91 @@
 
 
 #pragma mark - player
-@property (nonatomic) AVQueuePlayer *queuePlayer;
-@property (nonatomic) BOOL isPlaying;
+@property (nonatomic) AVQueuePlayer *queuePlayer;                            //主播放器, 就是用AVQueuePlayer实现的
+@property (nonatomic) BOOL isPlaying;                                        //是否正在播放
 @property (nonatomic) MPNowPlayingInfoCenter *infoCenter;
-@property (nonatomic) NSMutableArray *playerItems;
+@property (nonatomic) NSMutableArray *playerItems;                           //加载的播放项目数组
+@property (nonatomic) BOOL ifCanOpen;                                        //如果为NO,提示播放列表为空
 
-@property (weak, nonatomic) IBOutlet UISlider *audioSlider;//播放进度条
-@property (weak, nonatomic) IBOutlet UIProgressView *progressView;//缓存进度条
-@property (nonatomic) CGFloat totalSecond;//歌曲总时间(用秒计算)
-@property (nonatomic) CGFloat currentSecond;//当前时间
-@property (nonatomic) double buffer;//缓冲时间
-@property (weak, nonatomic) IBOutlet UILabel *currentTime;
-@property (weak, nonatomic) IBOutlet UILabel *totalTime;
-@property (weak, nonatomic) IBOutlet UIButton *hideButton;
-@property (weak, nonatomic) IBOutlet UIButton *hiddenLrcButton;
-@property (weak, nonatomic) IBOutlet UIButton *collectionButton;
+#pragma mark - playView
+@property (weak, nonatomic) IBOutlet UIView *playView;                       //播放主界面
+@property (weak, nonatomic) IBOutlet UIView *playBottomView;                 //承载底部控制播放的按钮界面的View
+@property (nonatomic) PlayButtonView *playButtonView;                        //底部控制播放的按钮界面
+@property (nonatomic) VolumeView *volumeView;                                //音量界面
+@property (nonatomic) BOOL isOpen;                                           //播放界面是否打开
+@property (nonatomic) UIView *playPointView;                                 //播放点(也就是界面上那个无处不在的圆点)
+@property (nonatomic) CGPoint tempPoint;                                     //记录播放点展开前的位置
+@property (nonatomic) UIDynamicAnimator *animation;                          //物理动效
+@property (weak, nonatomic) IBOutlet UIImageView *playViewBackImageView;     //播放界面背景图片,做了模糊处理
+@property (weak, nonatomic) IBOutlet UILabel *songLabel;                     //歌曲名
+@property (weak, nonatomic) IBOutlet UILabel *author;                        //歌手名
+@property (weak, nonatomic) IBOutlet UIView *imageV;                         //用于承载starImgV的VIew
+@property (weak, nonatomic) IBOutlet UIImageView *starImgV;                  //歌曲图片
+@property (weak, nonatomic) IBOutlet UITableView *lrcTableView;              //歌词表视图
+@property (weak, nonatomic) IBOutlet UITableView *ListTableView;             //当前播放的列表表视图
+@property (weak, nonatomic) IBOutlet UIView *topTempBackView;                //此View背景为灰色,位置和大小和导航栏一致.如果播放界面背景图片最上部被判定为白色,此View就显示,其他情况都隐藏.目的是为了防止看不清头部的三个按钮
 
-@property (weak, nonatomic) IBOutlet UIView *playView;
-@property (nonatomic) PlayButtonView *playButtonView;
-@property (nonatomic) VolumeView *volumeView;
-@property (nonatomic) UIView *playPointView;
-@property (nonatomic) BOOL isOpen;
-@property (nonatomic) CGPoint tempPoint;
-@property (nonatomic) UIDynamicAnimator *animation;//物理动效
-@property (weak, nonatomic) IBOutlet UIView *playBottomView;
+@property (nonatomic) UIView *playPointTempView;                             //第一次运行app时,提示可以移动playPoint的提示View
+
+@property (weak, nonatomic) IBOutlet UISlider *audioSlider;                  //播放进度条
+@property (weak, nonatomic) IBOutlet UIProgressView *progressView;           //缓存进度条
+@property (nonatomic) CGFloat totalSecond;                                   //歌曲总时间(用秒计算)
+@property (nonatomic) CGFloat currentSecond;                                 //当前时间
+@property (nonatomic) double buffer;                                         //缓冲时间
+@property (weak, nonatomic) IBOutlet UILabel *currentTime;                   //显示当前时间的label
+@property (weak, nonatomic) IBOutlet UILabel *totalTime;                     //显示总时间的label
+@property (weak, nonatomic) IBOutlet UIButton *hideButton;                   //退出播放界面按钮
+@property (weak, nonatomic) IBOutlet UIButton *hiddenLrcButton;              //切换图片个歌词就按钮
+@property (weak, nonatomic) IBOutlet UIButton *collectionButton;             //收藏按钮
+
+
 
 #pragma mark - VC
-@property (nonatomic) RecommendedViewController *recommendedVC;
-@property (nonatomic) SongViewController *songVC;
-@property (nonatomic) ListViewController *listVC;
-@property (nonatomic) RadioViewController *radioVC;
+@property (nonatomic) RecommendedViewController *recommendedVC;              //推荐
+@property (nonatomic) SongViewController *songVC;                            //歌单
+@property (nonatomic) ListViewController *listVC;                            //榜单
+@property (nonatomic) RadioViewController *radioVC;                          //电台
 
 #pragma mark - mainButtonView
-@property (weak, nonatomic) IBOutlet UIView *menuView;
-@property (weak, nonatomic) IBOutlet UIView *containerView;
-@property (nonatomic) UIViewController *currentViewController;
-@property (weak, nonatomic) IBOutlet UIButton *recommended;
-@property (weak, nonatomic) IBOutlet UIButton *song;
-@property (weak, nonatomic) IBOutlet UIButton *list;
-@property (weak, nonatomic) IBOutlet UIButton *radio;
+@property (weak, nonatomic) IBOutlet UIView *menuView;                       //自定制tabBar
+@property (weak, nonatomic) IBOutlet UIView *containerView;                  //容器View,装VC用的
+@property (nonatomic) UIViewController *currentViewController;               //记录当前VC
+@property (weak, nonatomic) IBOutlet UIButton *recommended;                  //------
+@property (weak, nonatomic) IBOutlet UIButton *song;                         //自定制tabBar
+@property (weak, nonatomic) IBOutlet UIButton *list;                         //上的四个按钮
+@property (weak, nonatomic) IBOutlet UIButton *radio;                        //------
 
-#pragma mark - tableView
+
+#pragma mark - 主tableView
+@property (weak, nonatomic) IBOutlet UILabel *infoLabel;                     //歌曲列表的title
 @property (nonatomic) UITableView *tableView;
 @property (nonatomic) NSMutableArray *dataSource;
 @property (nonatomic) SongModel *oneSong;
+#pragma mark - 主tableview的头视图
+@property (nonatomic) UIView *headerView;
+@property (nonatomic) UIImageView *imageView;
+@property (nonatomic) UILabel *headerLabel;
+@property (nonatomic) UIView *tempHeaderView;
 
 #pragma mark - lrcTableView
 @property (nonatomic) NSMutableArray *timeArray;
 @property (nonatomic) NSMutableArray *lrcArray;
 @property (nonatomic) NSString *lrc;
 
-#pragma mark _ tempViews
-@property (nonatomic) UIView *tempView;
+#pragma mark - tempViews
+@property (nonatomic) UIView *tempView;                                      //当播放点展开的时候,添加此tempView,防止再次操作
 @property (nonatomic) UIAlertView *tempAlertView;
 
+#pragma mark - 循环播放的模式
 typedef NS_ENUM(NSInteger, CirculationMode) {
-    CirculationModeIsCycle = 1,
-    CirculationModeIsSingleCycle = 2,
-    CirculationModeIsOrder = 3,
-    CirculationModeIsRandom = 4,
+    CirculationModeIsCycle = 1,                                              //列表循环
+    CirculationModeIsSingleCycle = 2,                                        //单曲循环
+    CirculationModeIsOrder = 3,                                              //列表播放
+    CirculationModeIsRandom = 4,                                             //随机
 };
+@property(nonatomic) CirculationMode cycleMode;                              //记录当前循环播放的模式
 
-@property(nonatomic) CirculationMode cycleMode;
-
-@property (nonatomic) Reachability *netState;//此时网络状态
+@property (nonatomic) Reachability *netState;                                //此时网络状态
 
 @end
 
@@ -142,8 +148,7 @@ typedef NS_ENUM(NSInteger, CirculationMode) {
 #pragma mark - 预设播放控制View
 - (void)viewDidAppear:(BOOL)animated{
     [super viewDidAppear:animated];
-    _tempAlertView = [[UIAlertView alloc] initWithTitle:@"提示" message:@"播放列表中没有任何歌曲" delegate:self cancelButtonTitle:@"确定" otherButtonTitles:nil, nil];
-    
+
     self.cycleMode = CirculationModeIsCycle;
     [_playButtonView.cycleButton setImage:[UIImage imageNamed:@"xunhuan1"] forState:UIControlStateNormal];
     
@@ -322,6 +327,7 @@ typedef NS_ENUM(NSInteger, CirculationMode) {
     
     //添加播放点
     [self.view addSubview:self.playPointView];
+    _tempAlertView = [[UIAlertView alloc] initWithTitle:@"提示" message:@"播放列表中没有任何歌曲\n去挑选几首喜欢的歌曲吧" delegate:self cancelButtonTitle:@"确定" otherButtonTitles:nil, nil];
     
     //初始化播放序列
     [self customPlayer];
@@ -390,6 +396,7 @@ typedef NS_ENUM(NSInteger, CirculationMode) {
         [weakSelf removePlayingStateKVO];
         [weakSelf openPlayViewWithCell];
         [weakSelf.ListTableView reloadData];
+        weakSelf.ifCanOpen = YES;
         [weakSelf.ListTableView scrollToRowAtIndexPath:[NSIndexPath indexPathForRow:0 inSection:0] atScrollPosition:UITableViewScrollPositionMiddle animated:YES];
         [weakSelf.ListTableView selectRowAtIndexPath:[NSIndexPath indexPathForRow:0 inSection:0] animated:NO scrollPosition:UITableViewScrollPositionNone];
         dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1.3 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
@@ -420,7 +427,6 @@ typedef NS_ENUM(NSInteger, CirculationMode) {
         [weakSelf.view addSubview:weakSelf.tableView];
         [weakSelf.view bringSubviewToFront:weakSelf.playPointView];
         
-        [weakSelf.ListTableView reloadData];
         [weakSelf.tableView registerNib:[UINib nibWithNibName:@"MainTableViewCell" bundle:nil] forCellReuseIdentifier:@"xxx"];
 //        weakSelf.left.constant = 30.0;
 //        weakSelf.top.constant = 30.0;
@@ -440,8 +446,6 @@ typedef NS_ENUM(NSInteger, CirculationMode) {
 
 - (void)costomHeaderView:(NSString *)title{
     self.headerView = [[UIView alloc]initWithFrame:CGRectMake(0, 0, SCREEN_WIDTH, 70)];
-    self.tableView.tableHeaderView = self.headerView;
-    
     self.imageView = [[UIImageView alloc]initWithFrame:CGRectMake(0, 0, SCREEN_WIDTH, 64)];
     self.imageView.image = [UIImage imageNamed:@"back2.jpg"];
     [self.headerView addSubview:self.imageView];
@@ -449,27 +453,51 @@ typedef NS_ENUM(NSInteger, CirculationMode) {
     UIButton *button = [[UIButton alloc] init];
     [button setTitle:@"<<" forState:UIControlStateNormal];
     [button addTarget:self action:@selector(backMainView) forControlEvents:UIControlEventTouchUpInside];
-    button.frame = CGRectMake(20, 27, 30, 30);
+    button.frame = CGRectMake(12, 25, 30, 30);
     [self.headerView addSubview:button];
     
     self.headerLabel = [[UILabel alloc] init];
     self.headerLabel.text = title;
-    self.headerLabel.frame = CGRectMake(0, 0, 150, 30);
-    self.headerLabel.center = CGPointMake(self.headerView.center.x, self.headerView.center.y + 10);
+    self.headerLabel.frame = CGRectMake(0, 32, SCREEN_WIDTH, 30);
+    //self.headerLabel.center = CGPointMake(self.headerView.center.x, self.headerView.center.y + 10);
     self.headerLabel.textAlignment = 1;
     self.headerLabel.textColor = [UIColor whiteColor];
     [self.headerView addSubview:self.headerLabel];
     
     self.tableView.tableHeaderView = self.headerView;
     
+    self.tempHeaderView = [[UIView alloc]initWithFrame:CGRectMake(0, -70, SCREEN_WIDTH, 70)];
+    UIImageView *imgV = [[UIImageView alloc]initWithFrame:CGRectMake(0, 0, SCREEN_WIDTH, 64)];
+    imgV.image = [UIImage imageNamed:@"back2.jpg"];
+    [self.tempHeaderView addSubview:imgV];
+    
+    UIButton *button0 = [[UIButton alloc] init];
+    [button0 setTitle:@"<<" forState:UIControlStateNormal];
+    [button0 addTarget:self action:@selector(backMainView) forControlEvents:UIControlEventTouchUpInside];
+    button0.frame = CGRectMake(12, 25, 30, 30);
+    [self.tempHeaderView addSubview:button0];
+    
+    UILabel *label = [[UILabel alloc] init];
+    label.text = title;
+    label.frame = CGRectMake(0, 32, SCREEN_WIDTH, 30);
+    //label.center = CGPointMake(self.tempHeaderView.center.x, self.tempHeaderView.center.y + 10);
+    label.textAlignment = 1;
+    label.textColor = [UIColor whiteColor];
+    [self.tempHeaderView addSubview:label];
+    self.tempHeaderView.alpha = 0.0;
+    [[UIApplication sharedApplication].keyWindow addSubview:self.tempHeaderView];
 }
 
 - (void)backMainView{
-    self.IS_LIKE = NO;
 //    self.left.constant = -20.0;
 //    self.top.constant = -20.0;
 //    self.bottom.constant = 0.0;
 //    self.right.constant = -20.0;
+    if (self.IS_LIKEOPEN) {
+        self.IS_LIKEOPEN = NO;
+    }
+    
+    
     CGAffineTransform newTransform =
     CGAffineTransformScale([UIApplication sharedApplication].keyWindow.transform, 1.0, 1.0);
     [UIView animateWithDuration:0.4 animations:^{
@@ -571,6 +599,7 @@ typedef NS_ENUM(NSInteger, CirculationMode) {
         __weak typeof(self) weakSelf = self;
         _radioVC.openPlayViewBlock = ^(NSMutableArray *songList){
             weakSelf.dataSource = songList;
+            [weakSelf.ListTableView reloadData];
             [weakSelf.queuePlayer pause];
             [weakSelf removePlayingStateKVO];
             [weakSelf openPlayViewWithCell];
@@ -648,6 +677,9 @@ typedef NS_ENUM(NSInteger, CirculationMode) {
 
 //隐藏播放页面
 - (IBAction)hidePlayView:(id)sender {
+    [UIView animateWithDuration:0.1 animations:^{
+        _volumeView.frame = CGRectMake(0, SCREEN_HEIGHT, SCREEN_WIDTH, self.playBottomView.bounds.size.height);
+    }];
     [(UIButton *)sender setShowsTouchWhenHighlighted:YES];
     self.hideButton.userInteractionEnabled = NO;
     self.isOpen = NO;
@@ -740,12 +772,11 @@ typedef NS_ENUM(NSInteger, CirculationMode) {
 
 //点击手势
 -(void)tapGR:(UITapGestureRecognizer *)tapGR{
+    if (!self.ifCanOpen) {
+        [_tempAlertView show];
+        return;
+    }
     [self.view bringSubviewToFront:self.playPointView];
-    //NSLog(@"%d, %d, %d", self.dataSource.count, self.searchDate.count, self.SongArray.count);
-//    if (self.dataSource.count == 0 && self.searchDate.count == 0) {
-//        [_tempAlertView show];
-//        return;
-//    }
     [self openPlayViewWithCell];
 }
 
@@ -773,14 +804,17 @@ typedef NS_ENUM(NSInteger, CirculationMode) {
         for (NSInteger index = 0; index < self.timeArray.count; index++) {
             if ([self.currentTime.text isEqualToString:self.timeArray[index]]) {
                 LrcTableViewCell *cell = (LrcTableViewCell *)[self.lrcTableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:index inSection:0]];
-//                LrcTableViewCell *beforeCell = (LrcTableViewCell *)[self.lrcTableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:index - 1 inSection:0]];
+                LrcTableViewCell *beforeCell = (LrcTableViewCell *)[self.lrcTableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:index - 1 inSection:0]];
                 [self.lrcTableView scrollToRowAtIndexPath:[NSIndexPath indexPathForRow:index inSection:0] atScrollPosition:UITableViewScrollPositionMiddle animated:YES];
-                //beforeCell.lrcLabel.textColor = [UIColor whiteColor];
-                cell.lrcLabel.textColor = [UIColor redColor];
-            } else {
-                LrcTableViewCell *beforeCell = (LrcTableViewCell *)[self.lrcTableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:index inSection:0]];
                 beforeCell.lrcLabel.textColor = [UIColor whiteColor];
+                beforeCell.transform = CGAffineTransformMakeScale(1.00, 1.00);
+                cell.lrcLabel.textColor = [UIColor redColor];
+                cell.transform = CGAffineTransformMakeScale(1.20, 1.20);
             }
+//            else {
+//                LrcTableViewCell *beforeCell = (LrcTableViewCell *)[self.lrcTableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:index inSection:0]];
+//                beforeCell.lrcLabel.textColor = [UIColor whiteColor];
+//            }
         }
         
         if (self.isPlaying) {
@@ -913,14 +947,11 @@ typedef NS_ENUM(NSInteger, CirculationMode) {
     }
 }
 
-
-
-
-
+#pragma mark - 刷新歌曲名称等信息
 //刷新歌曲名称等信息
 - (void)currentMusicIndexInfo{
     _topTempBackView.alpha = 0.0;
-    if (self.IS_LIKEOPEN) {
+    if (self.IS_LIKE) {
         self.songLabel.text = self.oneSongDetail.title;
         if (self.oneSongDetail.album_title.length != 0) {
             self.author.text = [NSString stringWithFormat:@"%@ - %@", self.oneSongDetail.author, self.oneSongDetail.album_title];
@@ -939,39 +970,38 @@ typedef NS_ENUM(NSInteger, CirculationMode) {
         //[self.starImgV sd_setImageWithURL:[NSURL URLWithString:self.oneSong.pic_radio]];
     }
     
+    //刷新背景图
     [self backImage];
-//    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-//        [self backImage];
-//    });
-//    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(2 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-//        [self backImage];
-//    });
-//    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(3 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-//        [self backImage];
-//    });
-//    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(4 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-//        [self backImage];
-//    });
+    
+    //刷新歌曲列表
+    AVPlayerItem *currentItem = [self.queuePlayer currentItem];
+    NSInteger currentInex = [self.playerItems indexOfObject:currentItem];
+    [_ListTableView scrollToRowAtIndexPath:[NSIndexPath indexPathForRow:currentInex inSection:0] atScrollPosition:UITableViewScrollPositionMiddle animated:YES];
+    [_ListTableView selectRowAtIndexPath:[NSIndexPath indexPathForRow:currentInex inSection:0] animated:NO scrollPosition:UITableViewScrollPositionNone];
+
 }
 
 - (void)backImage{
     NSString *imageKey;
-    if (self.IS_LIKEOPEN) {
+    if (self.IS_LIKE) {
         imageKey = self.oneSongDetail.pic_radio;
     } else {
         imageKey = self.oneSong.pic_radio;
     }
     UIImage *tempImage = [[SDImageCache sharedImageCache] imageFromDiskCacheForKey:imageKey];
     if (tempImage == nil) {
-        self.playViewBackImageView.image = [self blurryImage:[UIImage imageNamed:@"bg"] withBlurLevel: 0.9];
+        //self.playViewBackImageView.image = [self blurryImage:[UIImage imageNamed:@"bg"] withBlurLevel: 0.9];
+        
+        self.playViewBackImageView.image = [[UIImage imageNamed:@"bg"] applyTintEffectWithColor:[UIColor lightGrayColor]];
+        
         self.starImgV.image = [UIImage imageNamed:@"bg"];
         [[SDWebImageManager sharedManager] downloadImageWithURL:[NSURL URLWithString:imageKey] options:0 progress:^(NSInteger receivedSize, NSInteger expectedSize) {
                 //这里是处理下载进度
             } completed:^(UIImage *image, NSError *error, SDImageCacheType cacheType, BOOL finished, NSURL *imageURL) {
                 if (image) {//下载完成后
                     self.starImgV.image = image;
-                    self.playViewBackImageView.image = [self blurryImage:image withBlurLevel: 0.9];
-                    
+                    //self.playViewBackImageView.image = [self blurryImage:image withBlurLevel: 0.9];
+                    self.playViewBackImageView.image = [image applyTintEffectWithColor:[UIColor lightGrayColor]];
                     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
                         // 耗时的操作
                         BOOL isWhite = [[[MostColor alloc] init] mostColor:image];
@@ -988,8 +1018,8 @@ typedef NS_ENUM(NSInteger, CirculationMode) {
             }];
     } else {
         self.starImgV.image = tempImage;
-        self.playViewBackImageView.image = [self blurryImage:tempImage withBlurLevel: 0.9];
-        
+        //self.playViewBackImageView.image = [self blurryImage:tempImage withBlurLevel: 0.9];
+        self.playViewBackImageView.image = [tempImage applyTintEffectWithColor:[UIColor lightGrayColor]];
         dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
             // 耗时的操作
             BOOL isWhite = [[[MostColor alloc] init] mostColor:tempImage];
@@ -1064,7 +1094,7 @@ typedef NS_ENUM(NSInteger, CirculationMode) {
     if(NSClassFromString(@"MPNowPlayingInfoCenter"))
     {
         NSMutableDictionary *dict =[[NSMutableDictionary alloc] init];
-        if (self.IS_LIKEOPEN) {
+        if (self.IS_LIKE) {
             [dict setObject:self.oneSongDetail.title forKey:MPMediaItemPropertyTitle];
             [dict setObject:self.oneSongDetail.author forKey:MPMediaItemPropertyArtist];
             [dict setObject:self.oneSongDetail.album_title forKey:MPMediaItemPropertyAlbumTitle];
@@ -1141,13 +1171,16 @@ typedef NS_ENUM(NSInteger, CirculationMode) {
 
 - (void)changeAlpha{
     self.playView.alpha = 1.0;
-    [self.queuePlayer play];
+    //[self.queuePlayer play];
 }
 
 
 #pragma mark - tableView代理
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section{
     if (self.IS_SEARCHING && !self.isOpen) {
+        if (tableView == _ListTableView) {
+            return 1;
+        }
         return self.searchDate.count;
     }
     if (tableView == self.lrcTableView) {
@@ -1156,7 +1189,7 @@ typedef NS_ENUM(NSInteger, CirculationMode) {
         }
         return self.lrcArray.count;
     }
-    if (self.IS_LIKE) {
+    if (self.IS_LIKEOPEN) {
         return self.SongArray.count;
     }
     return self.dataSource.count;
@@ -1170,7 +1203,7 @@ typedef NS_ENUM(NSInteger, CirculationMode) {
         if (self.IS_SEARCHING) {
             SearchModel *searchModel = [self.searchDate objectAtIndex:indexPath.row];
             [cell updateWithSearchModel:searchModel];
-        } else if (self.IS_LIKE) {
+        } else if (self.IS_LIKEOPEN) {
             SongDetail *oneSongDetail = [self.SongArray objectAtIndex:indexPath.row];
             [cell updateWithSongDetail:oneSongDetail];
         } else {
@@ -1184,7 +1217,7 @@ typedef NS_ENUM(NSInteger, CirculationMode) {
         MainTableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"xxx" forIndexPath:indexPath];
         //cell.backgroundColor = [UIColor colorWithRed:0.16 green:0.72 blue:1.0 alpha:0.1];
         if (self.IS_SEARCHING) {
-            SearchModel *searchModel = [self.searchDate objectAtIndex:indexPath.row];
+            SearchModel *searchModel = [self.searchDate objectAtIndex:self.searchIndex];
             [cell updateWithSearchModel:searchModel];
         } else if (self.IS_LIKE) {
             SongDetail *oneSongDetail = [self.SongArray objectAtIndex:indexPath.row];
@@ -1220,7 +1253,7 @@ typedef NS_ENUM(NSInteger, CirculationMode) {
         self.cancelButton.alpha = 1.0;
         [self.view bringSubviewToFront:self.cancelButton];
     }
-
+    
     CGFloat yOffset = self.tableView.contentOffset.y;
     if (yOffset < 0) {
         CGFloat factor = -yOffset + 70;
@@ -1232,32 +1265,71 @@ typedef NS_ENUM(NSInteger, CirculationMode) {
         self.headerView.frame = f;
         self.imageView.frame = CGRectMake(0, f.origin.y, SCREEN_WIDTH, 70);
     }
+    
+    if (scrollView == self.tableView && !self.IS_SEARCHING) {
+        if (yOffset > 70) {
+            self.tempHeaderView.alpha = 1.0;
+            [UIView animateWithDuration:0.2 animations:^{
+                self.tempHeaderView.frame = CGRectMake(0, 0, SCREEN_WIDTH, 70);
+            }];
+        }
+        if (yOffset < 0) {
+            self.tempHeaderView.alpha = 0.0;
+            self.tempHeaderView.frame = CGRectMake(0, -70, SCREEN_WIDTH, 70);
+        }
+    }
 }
 
-
-//转跳播放页面
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath{
-    if (self.IS_LIKEOPEN && self.IS_LIKE) {
+    if (self.tempHeaderView != nil) {
+        [self.tempHeaderView removeFromSuperview];
+        self.tempHeaderView = nil;
+    }
+    [tableView deselectRowAtIndexPath:indexPath animated:YES];
+    if (tableView == self.tableView) {
+        if (self.IS_LIKEOPEN) {
+            self.IS_LIKE = YES;
+        } else {
+            self.IS_LIKE = NO;
+        }
+    }
+    
+    if (self.IS_SEARCHING && tableView == _ListTableView) {
+        return;
+    }
+    
+    [self.ListTableView reloadData];
+    self.ifCanOpen = YES;
+    
+    if (self.IS_LIKEOPEN) {
         if ([((SongDetail *)self.SongArray[indexPath.row]).song_id isEqualToString:self.oneSongDetail.song_id] && self.oneSongDetail != nil) {
             [self openPlayViewWithCell];
             return;
         }
+//        else {
+//            [self cuntomSongList:indexPath.row];
+//            return;
+//        }
     }
-    self.IS_LIKEOPEN = NO;
+    //self.IS_LIKEOPEN = NO;
     self.collectionButton.userInteractionEnabled = YES;
     if (self.IS_SEARCHING) {
+        self.searchIndex = indexPath.row;
         if ([((SearchModel *)self.searchDate[indexPath.row]).song_id isEqualToString:self.oneSong.song_id] && self.oneSong != nil) {
             [self openPlayViewWithCell];
             return;
         }
     }
-    if ([((SongModel *)self.dataSource[indexPath.row]).song_id isEqualToString:self.oneSong.song_id] && self.oneSong != nil) {
+    if ([((SongModel *)self.dataSource[indexPath.row]).song_id isEqualToString:self.oneSong.song_id] && self.oneSong != nil && !self.IS_LIKE) {
         [self openPlayViewWithCell];
         return;
     }
     [self removePlayingStateKVO];
     
-    [_ListTableView scrollToRowAtIndexPath:[NSIndexPath indexPathForRow:indexPath.row inSection:0] atScrollPosition:UITableViewScrollPositionMiddle animated:YES];
+    if (!self.IS_SEARCHING) {
+        [_ListTableView scrollToRowAtIndexPath:[NSIndexPath indexPathForRow:indexPath.row inSection:0] atScrollPosition:UITableViewScrollPositionMiddle animated:YES];
+    }
+    
     if (tableView == _ListTableView) {
         [self cuntomSongList:indexPath.row];
         return;
@@ -1274,10 +1346,7 @@ typedef NS_ENUM(NSInteger, CirculationMode) {
         [self cuntomSongList:indexPath.row];
         return;
     }
-//    if (self.IS_LIKE) {
-//        [self cuntomSongList:indexPath.row];
-//        return;
-//    }
+    
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1.3 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
         [self cuntomSongList:indexPath.row];
     });
@@ -1310,11 +1379,13 @@ typedef NS_ENUM(NSInteger, CirculationMode) {
             [self.playerItems addObject:item];
         }
         self.oneSong = self.dataSource[index];
+        self.oneSongDetail = nil;
         [self loadMusic:index];
     } else if (self.IS_SEARCHING) {
         [self.playerItems removeAllObjects];
         [[NetDataEngine sharedInstance] GET:[NSString stringWithFormat:SONG_URL, ((SearchModel *)(self.searchDate[index])).song_id, SONG_URL_X] success:^(id responsData) {
             self.oneSong = [SongModel parseRespondsData:responsData];
+            self.oneSongDetail = nil;
             AVURLAsset *asset = [AVURLAsset assetWithURL:[NSURL URLWithString:self.oneSong.songFiles[0]]];
             AVPlayerItem *item = [[AVPlayerItem alloc]initWithAsset:asset];
             [item addObserver:self
@@ -1338,7 +1409,7 @@ typedef NS_ENUM(NSInteger, CirculationMode) {
             [self.playerItems addObject:item];
         }
         self.oneSongDetail = self.SongArray[index];
-        
+        self.oneSong = nil;
         [self loadMusic:index];
     }
 }
@@ -1412,7 +1483,6 @@ typedef NS_ENUM(NSInteger, CirculationMode) {
     [[NetDataEngine sharedInstance] GET:url success:^(id responsData) {
         _searchDate = [SearchModel parseRespondsData:responsData];
         [_tableView reloadData];
-        [self.ListTableView reloadData];
     } failed:^(NSError *error) {
         NSLog(@"%@", error);
     }];
@@ -1443,67 +1513,69 @@ typedef NS_ENUM(NSInteger, CirculationMode) {
 }
 
 
-#pragma mark - 模糊图片
-- (UIImage *)blurryImage:(UIImage *)image withBlurLevel:(CGFloat)blur {
-    int boxSize = (int)(blur * 100);
-    boxSize -= (boxSize % 2) + 1;
-    
-    CGImageRef img = image.CGImage;
-    
-    vImage_Buffer inBuffer, outBuffer;
-    vImage_Error error;
-    void *pixelBuffer;
-    
-    CGDataProviderRef inProvider = CGImageGetDataProvider(img);
-    CFDataRef inBitmapData = CGDataProviderCopyData(inProvider);
-    
-    inBuffer.width = CGImageGetWidth(img);
-    inBuffer.height = CGImageGetHeight(img);
-    inBuffer.rowBytes = CGImageGetBytesPerRow(img);
-    inBuffer.data = (void*)CFDataGetBytePtr(inBitmapData);
-    
-    pixelBuffer = malloc(CGImageGetBytesPerRow(img) * CGImageGetHeight(img));
-    
-    outBuffer.data = pixelBuffer;
-    outBuffer.width = CGImageGetWidth(img);
-    outBuffer.height = CGImageGetHeight(img);
-    outBuffer.rowBytes = CGImageGetBytesPerRow(img);
-    
-    error = vImageBoxConvolve_ARGB8888(&inBuffer, &outBuffer, NULL,
-                                       0, 0, boxSize, boxSize, NULL,
-                                       kvImageEdgeExtend);
-    
-    
-    if (error) {
-        NSLog(@"error from convolution %ld", error);
-    }
-    
-    CGColorSpaceRef colorSpace = CGColorSpaceCreateDeviceRGB();
-    CGContextRef ctx = CGBitmapContextCreate(
-                                             outBuffer.data,
-                                             outBuffer.width,
-                                             outBuffer.height,
-                                             8,
-                                             outBuffer.rowBytes,
-                                             colorSpace,
-                                             CGImageGetBitmapInfo(image.CGImage));
-    
-    CGImageRef imageRef = CGBitmapContextCreateImage (ctx);
-    UIImage *returnImage = [UIImage imageWithCGImage:imageRef];
-    
-    //clean up
-    CGContextRelease(ctx);
-    CGColorSpaceRelease(colorSpace);
-    
-    free(pixelBuffer);
-    CFRelease(inBitmapData);
-    
-    //CGColorSpaceRelease(colorSpace);
-    CGImageRelease(imageRef);
-    
-    
-    return returnImage;
-}
+//#pragma mark - 模糊图片
+//- (UIImage *)blurryImage:(UIImage *)image withBlurLevel:(CGFloat)blur {
+//    int boxSize = (int)(blur * 100);
+//    boxSize -= (boxSize % 2) + 1;
+//    
+//    CGImageRef img = image.CGImage;
+//    
+//    vImage_Buffer inBuffer, outBuffer;
+//    vImage_Error error;
+//    void *pixelBuffer;
+//    
+//    CGDataProviderRef inProvider = CGImageGetDataProvider(img);
+//    CFDataRef inBitmapData = CGDataProviderCopyData(inProvider);
+//    
+//    inBuffer.width = CGImageGetWidth(img);
+//    inBuffer.height = CGImageGetHeight(img);
+//    inBuffer.rowBytes = CGImageGetBytesPerRow(img);
+//    inBuffer.data = (void*)CFDataGetBytePtr(inBitmapData);
+//    
+//    pixelBuffer = malloc(CGImageGetBytesPerRow(img) * CGImageGetHeight(img));
+//    
+//    outBuffer.data = pixelBuffer;
+//    outBuffer.width = CGImageGetWidth(img);
+//    outBuffer.height = CGImageGetHeight(img);
+//    outBuffer.rowBytes = CGImageGetBytesPerRow(img);
+//    
+//    error = vImageBoxConvolve_ARGB8888(&inBuffer, &outBuffer, NULL,
+//                                       0, 0, boxSize, boxSize, NULL,
+//                                       kvImageEdgeExtend);
+//    
+//    
+//    if (error) {
+//        NSLog(@"error from convolution %ld", error);
+//    }
+//    
+//    CGColorSpaceRef colorSpace = CGColorSpaceCreateDeviceRGB();
+//    CGContextRef ctx = CGBitmapContextCreate(
+//                                             outBuffer.data,
+//                                             outBuffer.width,
+//                                             outBuffer.height,
+//                                             8,
+//                                             outBuffer.rowBytes,
+//                                             colorSpace,
+//                                             CGImageGetBitmapInfo(image.CGImage));
+//    
+//    CGImageRef imageRef = CGBitmapContextCreateImage (ctx);
+//    UIImage *returnImage = [UIImage imageWithCGImage:imageRef];
+//    
+//    //clean up
+//    CGContextRelease(ctx);
+//    CGColorSpaceRelease(colorSpace);
+//    
+//    free(pixelBuffer);
+//    CFRelease(inBitmapData);
+//    
+//    //CGColorSpaceRelease(colorSpace);
+//    CGImageRelease(imageRef);
+//    
+//    
+//    return returnImage;
+//    
+//    return image;
+//}
 
 #pragma mark - Lrc
 - (IBAction)hiddenLrc:(id)sender {
@@ -1616,7 +1688,6 @@ typedef NS_ENUM(NSInteger, CirculationMode) {
         self.SongArray = [SongDetail MR_findAll];
         if (self.IS_LIKEOPEN) {
             [self.tableView reloadData];
-            [self.ListTableView reloadData];
         }
     }];
     [downloadTask resume];
@@ -1630,15 +1701,14 @@ typedef NS_ENUM(NSInteger, CirculationMode) {
     self.SongArray = [SongDetail MR_findAll];
     if (self.IS_LIKEOPEN) {
         [self.tableView reloadData];
-        [self.ListTableView reloadData];
     }
     NSLog(@"取消收藏");
 }
 
 - (IBAction)like:(id)sender {
     [self addTableViewWhitTitle:@"我的收藏"];
-    self.IS_LIKE = YES;
-    [self.ListTableView reloadData];
+    self.IS_LIKEOPEN = YES;
+    [self.tableView reloadData];
 }
 
 - (void)addTableViewWhitTitle:(NSString *)title{

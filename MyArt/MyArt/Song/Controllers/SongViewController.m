@@ -37,7 +37,6 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     [self customUI];
-    [self setupBaseKVNProgressUI];
     [KVNProgress showWithStatus:@"歌单初始化加载中..."];
     self.page = 1;
     self.dataSource = [[NSMutableArray alloc] init];
@@ -85,39 +84,6 @@
 }
 
 #pragma mark - UI
-
-- (void)setupBaseKVNProgressUI
-{
-    // See the documentation of all appearance propoerties
-    [KVNProgress appearance].statusColor = [UIColor darkGrayColor];
-    [KVNProgress appearance].statusFont = [UIFont systemFontOfSize:17.0f];
-    [KVNProgress appearance].circleStrokeForegroundColor = [UIColor darkGrayColor];
-    [KVNProgress appearance].circleStrokeBackgroundColor = [[UIColor darkGrayColor] colorWithAlphaComponent:0.3f];
-    [KVNProgress appearance].circleFillBackgroundColor = [UIColor clearColor];
-    [KVNProgress appearance].backgroundFillColor = [UIColor colorWithWhite:0.9f alpha:0.9f];
-    [KVNProgress appearance].backgroundTintColor = [UIColor whiteColor];
-    [KVNProgress appearance].successColor = [UIColor darkGrayColor];
-    [KVNProgress appearance].errorColor = [UIColor darkGrayColor];
-    [KVNProgress appearance].circleSize = 75.0f;
-    [KVNProgress appearance].lineWidth = 2.0f;
-}
-
-- (void)setupBaseKVNProgressUIRefresh
-{
-    // See the documentation of all appearance propoerties
-//    [KVNProgress appearance].statusColor = [UIColor darkGrayColor];
-//    [KVNProgress appearance].statusFont = [UIFont systemFontOfSize:17.0f];
-    [KVNProgress appearance].circleStrokeForegroundColor = [UIColor darkGrayColor];
-    [KVNProgress appearance].circleStrokeBackgroundColor = [[UIColor darkGrayColor] colorWithAlphaComponent:0.3f];
-    [KVNProgress appearance].circleFillBackgroundColor = [UIColor clearColor];
-    [KVNProgress appearance].backgroundFillColor = [UIColor colorWithWhite:0.9f alpha:0.9f];
-    [KVNProgress appearance].backgroundTintColor = [UIColor whiteColor];
-    [KVNProgress appearance].successColor = [UIColor darkGrayColor];
-    [KVNProgress appearance].errorColor = [UIColor darkGrayColor];
-    [KVNProgress appearance].circleSize = 30.0f;
-    [KVNProgress appearance].lineWidth = 2.0f;
-}
-
 - (void)customUI{
     [self.collectionView registerNib:[UINib nibWithNibName:@"SongCollectionViewCell" bundle:nil] forCellWithReuseIdentifier:@"coll"];
     
@@ -145,7 +111,6 @@
         if (weakSelf.isRefreshing) {
             return ;
         }
-        [self setupBaseKVNProgressUIRefresh];
         [KVNProgress show];
         weakSelf.isRefreshing = YES;
         weakSelf.page = 1;
@@ -178,7 +143,6 @@
         if (weakSelf.isRefreshing) {
             return ;
         }
-        [self setupBaseKVNProgressUIRefresh];
         [KVNProgress show];
         weakSelf.isRefreshing = YES;
         weakSelf.page++;
@@ -234,7 +198,6 @@
 }
 
 - (void)collectionView:(UICollectionView *)collectionView didSelectItemAtIndexPath:(NSIndexPath *)indexPath{
-    [self setupBaseKVNProgressUI];
     [KVNProgress showWithStatus:@"歌单加载中..."];
     [self.songData removeAllObjects];
     [self.songList removeAllObjects];

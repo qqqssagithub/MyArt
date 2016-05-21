@@ -46,10 +46,9 @@
     [self fetchData];
 
     self.pic = @[@"新歌.jpg", @"热歌.jpg", @"欧美.jpg", @"king.jpg", @"原创.jpg", @"华语.jpg", @"金典.jpg", @"网络.jpg", @"影视.jpg", @"对唱.jpg", @"bi.jpg", @"摇滚.jpg", @"ktv.jpg", @"cc.jpg",];
-    
-    [self setupBaseKVNProgressUI];//
+
     [KVNProgress showWithStatus:@"榜单初始化加载中..."];
-    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(5 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(8 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
         if (self.dataSource.count == 0) {
             [KVNProgress dismiss];
             [self addTempView];
@@ -102,7 +101,7 @@
     if (self.dataSource.count == 0) {
         [self fetchData];
     }
-    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(5 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(8 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
         if (self.dataSource.count == 0) {
             [KVNProgress dismiss];
             [self addTempView];
@@ -111,23 +110,6 @@
 }
 
 #pragma mark - UI
-
-- (void)setupBaseKVNProgressUI
-{
-    // See the documentation of all appearance propoerties
-    [KVNProgress appearance].statusColor = [UIColor darkGrayColor];
-    [KVNProgress appearance].statusFont = [UIFont systemFontOfSize:17.0f];
-    [KVNProgress appearance].circleStrokeForegroundColor = [UIColor darkGrayColor];
-    [KVNProgress appearance].circleStrokeBackgroundColor = [[UIColor darkGrayColor] colorWithAlphaComponent:0.3f];
-    [KVNProgress appearance].circleFillBackgroundColor = [UIColor clearColor];
-    [KVNProgress appearance].backgroundFillColor = [UIColor colorWithWhite:0.9f alpha:0.9f];
-    [KVNProgress appearance].backgroundTintColor = [UIColor whiteColor];
-    [KVNProgress appearance].successColor = [UIColor darkGrayColor];
-    [KVNProgress appearance].errorColor = [UIColor darkGrayColor];
-    [KVNProgress appearance].circleSize = 75.0f;
-    [KVNProgress appearance].lineWidth = 2.0f;
-}
-
 - (void)cunstomUI{
     [self.tableView registerNib:[UINib nibWithNibName:@"ListTableViewCell" bundle:nil] forCellReuseIdentifier:@"list"];
     self.tableView.showsVerticalScrollIndicator = NO;

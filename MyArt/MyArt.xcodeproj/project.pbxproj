@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		00214C131CF051B3009B2B7C /* UIImage+blur.m in Sources */ = {isa = PBXBuildFile; fileRef = 00214C121CF051B3009B2B7C /* UIImage+blur.m */; };
 		002ABC761CC1FA30004DC966 /* Reachability.m in Sources */ = {isa = PBXBuildFile; fileRef = 002ABC751CC1FA30004DC966 /* Reachability.m */; };
 		004BEE361CE1A49600E58F12 /* dy.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 004BEE311CE1A49600E58F12 /* dy.jpg */; };
 		004BEE371CE1A49600E58F12 /* jd.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 004BEE321CE1A49600E58F12 /* jd.jpg */; };
@@ -151,6 +152,8 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		00214C111CF051B3009B2B7C /* UIImage+blur.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIImage+blur.h"; sourceTree = "<group>"; };
+		00214C121CF051B3009B2B7C /* UIImage+blur.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIImage+blur.m"; sourceTree = "<group>"; };
 		002ABC741CC1FA30004DC966 /* Reachability.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Reachability.h; sourceTree = "<group>"; };
 		002ABC751CC1FA30004DC966 /* Reachability.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Reachability.m; sourceTree = "<group>"; };
 		004BEE311CE1A49600E58F12 /* dy.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = dy.jpg; sourceTree = "<group>"; };
@@ -425,6 +428,8 @@
 				004BEEEF1CE5D0BB00E58F12 /* MostColor.m */,
 				00F745C21CCF4F8E007D9AD5 /* NetworkRefreshFailedView.h */,
 				00F745C31CCF4F8E007D9AD5 /* NetworkRefreshFailedView.m */,
+				00214C111CF051B3009B2B7C /* UIImage+blur.h */,
+				00214C121CF051B3009B2B7C /* UIImage+blur.m */,
 			);
 			name = Public;
 			sourceTree = "<group>";
@@ -1209,6 +1214,7 @@
 				A69CBBFE1C2A5EF40076A22D /* NSManagedObjectContext+MagicalChainSave.m in Sources */,
 				A69CBD281C2C42AF0076A22D /* SongDetail.m in Sources */,
 				A6C794CF1C2A2FE5008631AE /* DBSphereView.m in Sources */,
+				00214C131CF051B3009B2B7C /* UIImage+blur.m in Sources */,
 				A69CBC041C2A5EF40076A22D /* NSPersistentStore+MagicalRecord.m in Sources */,
 				A6C794D01C2A2FE5008631AE /* FXImageView.m in Sources */,
 				A69CBD271C2C42AF0076A22D /* SongDetail+CoreDataProperties.m in Sources */,
@@ -1344,7 +1350,7 @@
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = MyArt/MyMusicTest.pch;
 				INFOPLIST_FILE = "$(SRCROOT)/MyArt/Info.plist";
-				IPHONEOS_DEPLOYMENT_TARGET = 7.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRIVATE_HEADERS_FOLDER_PATH = "";
 				PRODUCT_BUNDLE_IDENTIFIER = com.bjcsw321.MyArt;
@@ -1367,7 +1373,7 @@
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = MyArt/MyMusicTest.pch;
 				INFOPLIST_FILE = "$(SRCROOT)/MyArt/Info.plist";
-				IPHONEOS_DEPLOYMENT_TARGET = 7.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRIVATE_HEADERS_FOLDER_PATH = "";
 				PRODUCT_BUNDLE_IDENTIFIER = com.bjcsw321.MyArt;
