@@ -10,7 +10,7 @@
 
 @implementation UIImage (blur)
 
-- (UIImage *)applyTintEffectWithColor:(UIColor *)tintColor
+- (UIImage *)blurWithColor:(UIColor *)tintColor
 {
     const CGFloat EffectColorAlpha = 0.6;
     UIColor *effectColor = tintColor;
@@ -18,7 +18,7 @@
     CGFloat tintAlpha = CGColorGetAlpha(tintColor.CGColor);
     
     if (tintAlpha == 0.0f) {
-        return [self applyBlurWithRadius:15.0f
+        return [self applyBlurWithRadius:50.0f
                                 tintColor:nil
                     saturationDeltaFactor:1.0f
                                 maskImage:nil];
@@ -37,7 +37,7 @@
         }
     }
     
-    return [self applyBlurWithRadius:15.0f
+    return [self applyBlurWithRadius:50.0f
                             tintColor:effectColor
                 saturationDeltaFactor:1.0f
                             maskImage:nil];

@@ -992,7 +992,7 @@ typedef NS_ENUM(NSInteger, CirculationMode) {
     if (tempImage == nil) {
         //self.playViewBackImageView.image = [self blurryImage:[UIImage imageNamed:@"bg"] withBlurLevel: 0.9];
         
-        self.playViewBackImageView.image = [[UIImage imageNamed:@"bg"] applyTintEffectWithColor:[UIColor lightGrayColor]];
+        self.playViewBackImageView.image = [[UIImage imageNamed:@"bg"] blurWithColor:[UIColor clearColor]];
         
         self.starImgV.image = [UIImage imageNamed:@"bg"];
         [[SDWebImageManager sharedManager] downloadImageWithURL:[NSURL URLWithString:imageKey] options:0 progress:^(NSInteger receivedSize, NSInteger expectedSize) {
@@ -1001,7 +1001,7 @@ typedef NS_ENUM(NSInteger, CirculationMode) {
                 if (image) {//下载完成后
                     self.starImgV.image = image;
                     //self.playViewBackImageView.image = [self blurryImage:image withBlurLevel: 0.9];
-                    self.playViewBackImageView.image = [image applyTintEffectWithColor:[UIColor lightGrayColor]];
+                    self.playViewBackImageView.image = [image blurWithColor:[UIColor clearColor]];
                     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
                         // 耗时的操作
                         BOOL isWhite = [[[MostColor alloc] init] mostColor:image];
@@ -1019,7 +1019,7 @@ typedef NS_ENUM(NSInteger, CirculationMode) {
     } else {
         self.starImgV.image = tempImage;
         //self.playViewBackImageView.image = [self blurryImage:tempImage withBlurLevel: 0.9];
-        self.playViewBackImageView.image = [tempImage applyTintEffectWithColor:[UIColor lightGrayColor]];
+        self.playViewBackImageView.image = [tempImage blurWithColor:[UIColor clearColor]];
         dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
             // 耗时的操作
             BOOL isWhite = [[[MostColor alloc] init] mostColor:tempImage];

@@ -10,6 +10,6 @@
 
 @interface UIImage (blur)
 
-- (UIImage *)applyTintEffectWithColor:(UIColor *)tintColor;
+- (UIImage *)blurWithColor:(UIColor *)tintColor;
 
 @end
