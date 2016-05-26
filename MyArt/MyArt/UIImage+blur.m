@@ -19,9 +19,7 @@
     
     if (tintAlpha == 0.0f) {
         return [self applyBlurWithRadius:50.0f
-                                tintColor:nil
-                    saturationDeltaFactor:1.0f
-                                maskImage:nil];
+                                tintColor:nil];
     }
     
     if (componentCount == 2) {
@@ -38,13 +36,10 @@
     }
     
     return [self applyBlurWithRadius:50.0f
-                            tintColor:effectColor
-                saturationDeltaFactor:1.0f
-                            maskImage:nil];
+                            tintColor:effectColor];
 }
 
-- (UIImage *)applyBlurWithRadius:(CGFloat)blurRadius tintColor:(UIColor *)tintColor saturationDeltaFactor:(CGFloat)saturationDeltaFactor maskImage:(UIImage *)maskImage
-{
+- (UIImage *)applyBlurWithRadius:(CGFloat)blurRadius tintColor:(UIColor *)tintColor {
     // Check pre-conditions.
     if (self.size.width < 1 || self.size.height < 1) {
         NSLog (@"*** error: invalid size: (%.2f x %.2f). Both dimensions must be >= 1: %@", self.size.width, self.size.height, self);
@@ -54,16 +49,12 @@
         NSLog (@"*** error: image must be backed by a CGImage: %@", self);
         return nil;
     }
-    if (maskImage && !maskImage.CGImage) {
-        NSLog (@"*** error: maskImage must be backed by a CGImage: %@", maskImage);
-        return nil;
-    }
     
     CGRect imageRect = { CGPointZero, self.size };
     UIImage *effectImage = self;
     
     BOOL hasBlur = blurRadius > __FLT_EPSILON__;
-    BOOL hasSaturationChange = fabs(saturationDeltaFactor - 1.) > __FLT_EPSILON__;
+    BOOL hasSaturationChange = fabs(1.0 - 1.) > __FLT_EPSILON__;
     if (hasBlur || hasSaturationChange) {
         UIGraphicsBeginImageContextWithOptions(self.size, NO, [[UIScreen mainScreen] scale]);
         CGContextRef effectInContext = UIGraphicsGetCurrentContext();
@@ -109,7 +100,7 @@
         }
         BOOL effectImageBuffersAreSwapped = NO;
         if (hasSaturationChange) {
-            CGFloat s = saturationDeltaFactor;
+            CGFloat s = 1.0;
             CGFloat floatingPointSaturationMatrix[] = {
                 0.0722 + 0.9278 * s,  0.0722 - 0.0722 * s,  0.0722 - 0.0722 * s,  0,
                 0.7152 - 0.7152 * s,  0.7152 + 0.2848 * s,  0.7152 - 0.7152 * s,  0,
@@ -151,9 +142,6 @@
     // Draw effect image.
     if (hasBlur) {
         CGContextSaveGState(outputContext);
-        if (maskImage) {
-            CGContextClipToMask(outputContext, imageRect, maskImage.CGImage);
-        }
         CGContextDrawImage(outputContext, imageRect, effectImage.CGImage);
         CGContextRestoreGState(outputContext);
     }

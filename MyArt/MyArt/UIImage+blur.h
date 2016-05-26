@@ -10,6 +10,9 @@
 
 @interface UIImage (blur)
 
+/**
+参数 tintColor 上层蒙层的颜色
+*/
 - (UIImage *)blurWithColor:(UIColor *)tintColor;
 
 @end

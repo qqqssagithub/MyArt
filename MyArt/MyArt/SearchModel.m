@@ -12,10 +12,14 @@
 
 + (NSMutableArray*)parseRespondsData:(NSDictionary*)dictionary{
     NSMutableArray *mainArray = [NSMutableArray array];
-    NSArray *dataArray = dictionary[@"result"][@"song_info"][@"song_list"];
-    for (NSDictionary *dic in dataArray) {
+    NSArray *dataArray0 = dictionary[@"result"][@"song_info"][@"song_list"];
+    NSArray *dataArray1 = dictionary[@"result"][@"album_info"][@"album_list"];
+    for (NSInteger index = 0; index < dataArray0.count; index ++) {
         SearchModel *model = [[SearchModel alloc] init];
-        [model setValuesForKeysWithDictionary:dic];
+        model.title = dataArray0[index][@"title"];
+        model.pic_small = dataArray1[index][@"pic_small"];
+        model.song_id = dataArray0[index][@"song_id"];
+        model.author = dataArray0[index][@"author"];
         [mainArray addObject:model];
     }
     return mainArray;

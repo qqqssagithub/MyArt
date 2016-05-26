@@ -186,22 +186,27 @@ typedef NS_ENUM(NSInteger, CirculationMode) {
     [self.hiddenLrcButton setShowsTouchWhenHighlighted:YES];
     [self.hideButton setShowsTouchWhenHighlighted:YES];
     
+    
+    
     __block typeof(self) weakSelf = self;
     _playButtonView.operation = ^(UIButton *button){
         if (button.tag == 201) {
             if (weakSelf.cycleMode == CirculationModeIsCycle) {
                 weakSelf.cycleMode = CirculationModeIsSingleCycle;
                 [weakSelf.playButtonView.cycleButton setImage:[UIImage imageNamed:@"danqu1"] forState:UIControlStateNormal];
+                [weakSelf cycleModeWithTitle:@"单曲循环"];
                 return;
             }
             if (weakSelf.cycleMode == CirculationModeIsSingleCycle) {
                 weakSelf.cycleMode = CirculationModeIsRandom;
                 [weakSelf.playButtonView.cycleButton setImage:[UIImage imageNamed:@"suiji1"] forState:UIControlStateNormal];
+                [weakSelf cycleModeWithTitle:@"随机播放"];
                 return;
             }
             if (weakSelf.cycleMode == CirculationModeIsRandom) {
                 weakSelf.cycleMode = CirculationModeIsCycle;
                 [weakSelf.playButtonView.cycleButton setImage:[UIImage imageNamed:@"xunhuan1"] forState:UIControlStateNormal];
+                [weakSelf cycleModeWithTitle:@"列表循环"];
                 return;
             }
         }
@@ -234,6 +239,22 @@ typedef NS_ENUM(NSInteger, CirculationMode) {
     _volumeView.volume = ^(float value){
         weakSelf.queuePlayer.volume = value;
     };
+}
+
+- (void)cycleModeWithTitle:(NSString *)title {
+    UIView *whiteView = [[UIView alloc] initWithFrame:CGRectMake(SCREEN_WIDTH /2 -50, SCREEN_HEIGHT -117, 100, 44)];
+    whiteView.layer.cornerRadius = 5;
+    whiteView.layer.masksToBounds = YES;
+    whiteView.backgroundColor = [UIColor colorWithWhite:1.0 alpha:0.9];
+    [self.view addSubview:whiteView];
+    UILabel *netLabel = [[UILabel alloc] initWithFrame:CGRectMake(0, 12, 100, 20)];
+    netLabel.text = title;
+    netLabel.textAlignment = NSTextAlignmentCenter;
+    netLabel.textColor = [UIColor blackColor];
+    [whiteView addSubview:netLabel];
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(2 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+        [whiteView removeFromSuperview];
+    });
 }
 
 //上一曲
@@ -446,7 +467,7 @@ typedef NS_ENUM(NSInteger, CirculationMode) {
 
 - (void)costomHeaderView:(NSString *)title{
     self.headerView = [[UIView alloc]initWithFrame:CGRectMake(0, 0, SCREEN_WIDTH, 70)];
-    self.imageView = [[UIImageView alloc]initWithFrame:CGRectMake(0, 0, SCREEN_WIDTH, 64)];
+    self.imageView = [[UIImageView alloc]initWithFrame:CGRectMake(0, 0, SCREEN_WIDTH, 70)];
     self.imageView.image = [UIImage imageNamed:@"back2.jpg"];
     [self.headerView addSubview:self.imageView];
     
@@ -465,9 +486,10 @@ typedef NS_ENUM(NSInteger, CirculationMode) {
     [self.headerView addSubview:self.headerLabel];
     
     self.tableView.tableHeaderView = self.headerView;
+    self.tableView.tableHeaderView.backgroundColor = [UIColor redColor];
     
     self.tempHeaderView = [[UIView alloc]initWithFrame:CGRectMake(0, -70, SCREEN_WIDTH, 70)];
-    UIImageView *imgV = [[UIImageView alloc]initWithFrame:CGRectMake(0, 0, SCREEN_WIDTH, 64)];
+    UIImageView *imgV = [[UIImageView alloc]initWithFrame:CGRectMake(0, 0, SCREEN_WIDTH, 70)];
     imgV.image = [UIImage imageNamed:@"back2.jpg"];
     [self.tempHeaderView addSubview:imgV];
     
@@ -485,7 +507,7 @@ typedef NS_ENUM(NSInteger, CirculationMode) {
     label.textColor = [UIColor whiteColor];
     [self.tempHeaderView addSubview:label];
     self.tempHeaderView.alpha = 0.0;
-    [[UIApplication sharedApplication].keyWindow addSubview:self.tempHeaderView];
+    [self.view addSubview:self.tempHeaderView];
 }
 
 - (void)backMainView{
@@ -502,6 +524,7 @@ typedef NS_ENUM(NSInteger, CirculationMode) {
     CGAffineTransformScale([UIApplication sharedApplication].keyWindow.transform, 1.0, 1.0);
     [UIView animateWithDuration:0.4 animations:^{
         [self.baseView setTransform:newTransform];
+        self.tempHeaderView.frame = CGRectMake(SCREEN_WIDTH, self.tempHeaderView.frame.origin.y, SCREEN_WIDTH, 70);
         self.tableView.frame = CGRectMake(SCREEN_WIDTH, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
     }];
     
@@ -511,6 +534,8 @@ typedef NS_ENUM(NSInteger, CirculationMode) {
 - (void)removeTable{
     [self.tableView removeFromSuperview];
     self.tableView = nil;
+    [self.tempHeaderView removeFromSuperview];
+    self.tempHeaderView = nil;
 }
 
 #pragma mark - 主界面控制按钮
@@ -776,7 +801,6 @@ typedef NS_ENUM(NSInteger, CirculationMode) {
         [_tempAlertView show];
         return;
     }
-    [self.view bringSubviewToFront:self.playPointView];
     [self openPlayViewWithCell];
 }
 
@@ -888,6 +912,7 @@ typedef NS_ENUM(NSInteger, CirculationMode) {
         NSLog(@"似乎已断开与互联网的连接");
         netTitle = @"似乎已断开与互联网的连接";
     }
+    
     UIView *backView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT)];
     backView.backgroundColor = [UIColor colorWithWhite:0.0 alpha:0.3];
     [[UIApplication sharedApplication].keyWindow addSubview:backView];
@@ -1244,6 +1269,9 @@ typedef NS_ENUM(NSInteger, CirculationMode) {
 }
 
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath{
+    if (tableView == self.tableView || tableView == self.ListTableView) {
+        return 54;
+    }
     return 43;
 }
 
@@ -1281,10 +1309,6 @@ typedef NS_ENUM(NSInteger, CirculationMode) {
 }
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath{
-    if (self.tempHeaderView != nil) {
-        [self.tempHeaderView removeFromSuperview];
-        self.tempHeaderView = nil;
-    }
     [tableView deselectRowAtIndexPath:indexPath animated:YES];
     if (tableView == self.tableView) {
         if (self.IS_LIKEOPEN) {
@@ -1306,10 +1330,6 @@ typedef NS_ENUM(NSInteger, CirculationMode) {
             [self openPlayViewWithCell];
             return;
         }
-//        else {
-//            [self cuntomSongList:indexPath.row];
-//            return;
-//        }
     }
     //self.IS_LIKEOPEN = NO;
     self.collectionButton.userInteractionEnabled = YES;
@@ -1353,6 +1373,7 @@ typedef NS_ENUM(NSInteger, CirculationMode) {
 }
 
 - (void)openPlayViewWithCell{
+    [self.view bringSubviewToFront:self.playPointView];
     [self.view bringSubviewToFront:self.playView];
     [self.view bringSubviewToFront:self.playButtonView];
     self.playPointView.userInteractionEnabled = NO;

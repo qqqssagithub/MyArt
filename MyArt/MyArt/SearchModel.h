@@ -11,6 +11,7 @@
 @interface SearchModel : BaseModel
 
 @property (nonatomic, copy) NSString *title;
+@property (nonatomic, copy) NSString *pic_small;
 @property (nonatomic, copy) NSString *song_id;
 @property (nonatomic, copy) NSString *author;
 

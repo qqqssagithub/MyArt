@@ -14,20 +14,29 @@
 
 
 - (void)updateWithModel:(SongModel *)model{
+    [self.imgV sd_setImageWithURL:[NSURL URLWithString:model.pic_small] placeholderImage:[UIImage imageNamed:@"bg"]];
     self.title.text = model.title;
     self.author.text = model.author;
 }
 
 
 - (void)updateWithSearchModel:(SearchModel *)model{
+    [self.imgV sd_setImageWithURL:[NSURL URLWithString:model.pic_small] placeholderImage:[UIImage imageNamed:@"bg"]];
     self.title.text = model.title;
     self.author.text = model.author;
 }
 
 - (void)updateWithSongDetail:(SongDetail *)oneSongDetail{
+    [self.imgV sd_setImageWithURL:[NSURL URLWithString:oneSongDetail.pic_small] placeholderImage:[UIImage imageNamed:@"bg"]];
     self.title.text = oneSongDetail.title;
     self.author.text = oneSongDetail.author;
 }
+
+//- (void)updateWithBaseModel:(BaseModel *)baseModel {
+//    [self.imgV sd_setImageWithURL:[NSURL URLWithString:model.pic_small] placeholderImage:[UIImage imageNamed:@"bg"]];
+//    self.title.text = model.title;
+//    self.author.text = model.author;
+//}
 
 - (void)awakeFromNib {
     // Initialization code
