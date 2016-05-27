@@ -583,11 +583,11 @@
 			children = (
 				00F745C11CCF4F4B007D9AD5 /* Public */,
 				A6C7951D1C2A362C008631AE /* NetEngine */,
-				A6C7951C1C2A3593008631AE /* 基类 */,
-				A6C7951B1C2A3578008631AE /* Temp */,
-				A6C795171C2A3368008631AE /* 第三方库 */,
+				A6C7951C1C2A3593008631AE /* Base */,
+				A6C7951B1C2A3578008631AE /* App */,
+				A6C795171C2A3368008631AE /* Third */,
 				A6C795161C2A330D008631AE /* Resources */,
-				A6C7951E1C2A3662008631AE /* 主页面 */,
+				A6C7951E1C2A3662008631AE /* Main */,
 				A6C7947F1C2A2FE5008631AE /* Recommended */,
 				A6C794941C2A2FE5008631AE /* Song */,
 				A6C794571C2A2FE5008631AE /* List */,
@@ -889,7 +889,7 @@
 			name = Resources;
 			sourceTree = "<group>";
 		};
-		A6C795171C2A3368008631AE /* 第三方库 */ = {
+		A6C795171C2A3368008631AE /* Third */ = {
 			isa = PBXGroup;
 			children = (
 				A69CBBB21C2A5EF40076A22D /* MagicalRecord */,
@@ -898,10 +898,10 @@
 				A6C794371C2A2FE4008631AE /* FXImageView */,
 				A6C7943D1C2A2FE4008631AE /* JHRefresh */,
 			);
-			name = "第三方库";
+			name = Third;
 			sourceTree = "<group>";
 		};
-		A6C7951B1C2A3578008631AE /* Temp */ = {
+		A6C7951B1C2A3578008631AE /* App */ = {
 			isa = PBXGroup;
 			children = (
 				A6C794631C2A2FE5008631AE /* main.m */,
@@ -911,10 +911,10 @@
 				A6C7940F1C2A2FE4008631AE /* Assets.xcassets */,
 				A6C794121C2A2FE4008631AE /* LaunchScreen.storyboard */,
 			);
-			name = Temp;
+			name = App;
 			sourceTree = "<group>";
 		};
-		A6C7951C1C2A3593008631AE /* 基类 */ = {
+		A6C7951C1C2A3593008631AE /* Base */ = {
 			isa = PBXGroup;
 			children = (
 				A6C794141C2A2FE4008631AE /* BaseModel.h */,
@@ -922,7 +922,7 @@
 				A6C794161C2A2FE4008631AE /* BaseViewController.h */,
 				A6C794171C2A2FE4008631AE /* BaseViewController.m */,
 			);
-			name = "基类";
+			name = Base;
 			sourceTree = "<group>";
 		};
 		A6C7951D1C2A362C008631AE /* NetEngine */ = {
@@ -936,7 +936,7 @@
 			name = NetEngine;
 			sourceTree = "<group>";
 		};
-		A6C7951E1C2A3662008631AE /* 主页面 */ = {
+		A6C7951E1C2A3662008631AE /* Main */ = {
 			isa = PBXGroup;
 			children = (
 				A69CBBA81C2A5D160076A22D /* Data */,
@@ -944,7 +944,7 @@
 				A6C795201C2A36EC008631AE /* Model */,
 				A6C7951F1C2A366D008631AE /* Controller */,
 			);
-			name = "主页面";
+			name = Main;
 			sourceTree = "<group>";
 		};
 		A6C7951F1C2A366D008631AE /* Controller */ = {

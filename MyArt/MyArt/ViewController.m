@@ -20,6 +20,7 @@
 #import "MostColor.h"
 #import "UIImage+blur.h"
 
+//Endless loud music
 
 @interface ViewController () <UITableViewDataSource, UITableViewDelegate, UISearchBarDelegate>
 
@@ -42,10 +43,10 @@
 
 #pragma mark - baseView
 @property (weak, nonatomic) IBOutlet UIView *baseView;
-@property (weak, nonatomic) IBOutlet NSLayoutConstraint *left;
-@property (weak, nonatomic) IBOutlet NSLayoutConstraint *top;
-@property (weak, nonatomic) IBOutlet NSLayoutConstraint *bottom;
-@property (weak, nonatomic) IBOutlet NSLayoutConstraint *right;
+//@property (weak, nonatomic) IBOutlet NSLayoutConstraint *left;
+//@property (weak, nonatomic) IBOutlet NSLayoutConstraint *top;
+//@property (weak, nonatomic) IBOutlet NSLayoutConstraint *bottom;
+//@property (weak, nonatomic) IBOutlet NSLayoutConstraint *right;
 @property (weak, nonatomic) IBOutlet NSLayoutConstraint *heightA;
 @property (weak, nonatomic) IBOutlet NSLayoutConstraint *heightB;
 @property (weak, nonatomic) IBOutlet NSLayoutConstraint *heightC;
@@ -449,16 +450,10 @@ typedef NS_ENUM(NSInteger, CirculationMode) {
         [weakSelf.view bringSubviewToFront:weakSelf.playPointView];
         
         [weakSelf.tableView registerNib:[UINib nibWithNibName:@"MainTableViewCell" bundle:nil] forCellReuseIdentifier:@"xxx"];
-//        weakSelf.left.constant = 30.0;
-//        weakSelf.top.constant = 30.0;
-//        weakSelf.bottom.constant = 30.0;
-//        weakSelf.right.constant = 30.0;
         CGAffineTransform newTransform =
         CGAffineTransformScale([UIApplication sharedApplication].keyWindow.transform, 0.7, 0.7);
         [UIView animateWithDuration:0.4 animations:^{
             [weakSelf.baseView setTransform:newTransform];
-//            weakSelf.baseView.alpha = 0.5;
-//            [weakSelf.baseView layoutIfNeeded];
             weakSelf.tableView.frame = CGRectMake(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
         }];
         [weakSelf costomHeaderView:title];
@@ -511,14 +506,9 @@ typedef NS_ENUM(NSInteger, CirculationMode) {
 }
 
 - (void)backMainView{
-//    self.left.constant = -20.0;
-//    self.top.constant = -20.0;
-//    self.bottom.constant = 0.0;
-//    self.right.constant = -20.0;
     if (self.IS_LIKEOPEN) {
         self.IS_LIKEOPEN = NO;
     }
-    
     
     CGAffineTransform newTransform =
     CGAffineTransformScale([UIApplication sharedApplication].keyWindow.transform, 1.0, 1.0);
@@ -818,6 +808,7 @@ typedef NS_ENUM(NSInteger, CirculationMode) {
         [panGes setTranslation:CGPointZero inView:self.baseView];
         
     } else if (panGes.state == UIGestureRecognizerStateCancelled || panGes.state == UIGestureRecognizerStateEnded) {
+
     }
 }
 
@@ -1532,71 +1523,6 @@ typedef NS_ENUM(NSInteger, CirculationMode) {
     [_searchBar removeFromSuperview];
     _searchBar = nil;
 }
-
-
-//#pragma mark - 模糊图片
-//- (UIImage *)blurryImage:(UIImage *)image withBlurLevel:(CGFloat)blur {
-//    int boxSize = (int)(blur * 100);
-//    boxSize -= (boxSize % 2) + 1;
-//    
-//    CGImageRef img = image.CGImage;
-//    
-//    vImage_Buffer inBuffer, outBuffer;
-//    vImage_Error error;
-//    void *pixelBuffer;
-//    
-//    CGDataProviderRef inProvider = CGImageGetDataProvider(img);
-//    CFDataRef inBitmapData = CGDataProviderCopyData(inProvider);
-//    
-//    inBuffer.width = CGImageGetWidth(img);
-//    inBuffer.height = CGImageGetHeight(img);
-//    inBuffer.rowBytes = CGImageGetBytesPerRow(img);
-//    inBuffer.data = (void*)CFDataGetBytePtr(inBitmapData);
-//    
-//    pixelBuffer = malloc(CGImageGetBytesPerRow(img) * CGImageGetHeight(img));
-//    
-//    outBuffer.data = pixelBuffer;
-//    outBuffer.width = CGImageGetWidth(img);
-//    outBuffer.height = CGImageGetHeight(img);
-//    outBuffer.rowBytes = CGImageGetBytesPerRow(img);
-//    
-//    error = vImageBoxConvolve_ARGB8888(&inBuffer, &outBuffer, NULL,
-//                                       0, 0, boxSize, boxSize, NULL,
-//                                       kvImageEdgeExtend);
-//    
-//    
-//    if (error) {
-//        NSLog(@"error from convolution %ld", error);
-//    }
-//    
-//    CGColorSpaceRef colorSpace = CGColorSpaceCreateDeviceRGB();
-//    CGContextRef ctx = CGBitmapContextCreate(
-//                                             outBuffer.data,
-//                                             outBuffer.width,
-//                                             outBuffer.height,
-//                                             8,
-//                                             outBuffer.rowBytes,
-//                                             colorSpace,
-//                                             CGImageGetBitmapInfo(image.CGImage));
-//    
-//    CGImageRef imageRef = CGBitmapContextCreateImage (ctx);
-//    UIImage *returnImage = [UIImage imageWithCGImage:imageRef];
-//    
-//    //clean up
-//    CGContextRelease(ctx);
-//    CGColorSpaceRelease(colorSpace);
-//    
-//    free(pixelBuffer);
-//    CFRelease(inBitmapData);
-//    
-//    //CGColorSpaceRelease(colorSpace);
-//    CGImageRelease(imageRef);
-//    
-//    
-//    return returnImage;
-//    
-//    return image;
-//}
 
 #pragma mark - Lrc
 - (IBAction)hiddenLrc:(id)sender {
