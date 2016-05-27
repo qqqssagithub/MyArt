@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="9059" systemVersion="14F27" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="10116" systemVersion="15B42" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES">
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="9049"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="10085"/>
         <capability name="Aspect ratio constraints" minToolsVersion="5.1"/>
     </dependencies>
     <objects>
@@ -142,6 +142,16 @@
                     <exclude reference="e7V-kk-HLm"/>
                 </mask>
                 <mask key="constraints">
+                    <exclude reference="GHs-F7-uVe"/>
+                    <exclude reference="xPD-el-DHV"/>
+                    <exclude reference="6PX-h5-6Or"/>
+                    <exclude reference="CYf-pS-exX"/>
+                    <exclude reference="YVC-IQ-QhR"/>
+                    <exclude reference="soK-oO-JXU"/>
+                    <exclude reference="tQc-tx-IxP"/>
+                    <exclude reference="UJQ-m8-Ihg"/>
+                    <exclude reference="V9d-On-fnR"/>
+                    <exclude reference="bhK-CD-gPx"/>
                     <exclude reference="B5b-eu-fRu"/>
                     <exclude reference="CC5-bA-klv"/>
                     <exclude reference="G12-eC-Tx0"/>
@@ -149,20 +159,10 @@
                     <exclude reference="elb-kW-B24"/>
                     <exclude reference="sud-Vf-EaU"/>
                     <exclude reference="yyN-1X-6BY"/>
-                    <exclude reference="GHs-F7-uVe"/>
-                    <exclude reference="xPD-el-DHV"/>
-                    <exclude reference="QvC-xP-KVm"/>
-                    <exclude reference="UiT-bb-Cus"/>
-                    <exclude reference="6PX-h5-6Or"/>
-                    <exclude reference="CYf-pS-exX"/>
-                    <exclude reference="YVC-IQ-QhR"/>
-                    <exclude reference="soK-oO-JXU"/>
-                    <exclude reference="tQc-tx-IxP"/>
                     <exclude reference="R1Y-8z-saO"/>
                     <exclude reference="Z7l-Lj-JSW"/>
-                    <exclude reference="UJQ-m8-Ihg"/>
-                    <exclude reference="V9d-On-fnR"/>
-                    <exclude reference="bhK-CD-gPx"/>
+                    <exclude reference="QvC-xP-KVm"/>
+                    <exclude reference="UiT-bb-Cus"/>
                 </mask>
             </variation>
             <variation key="heightClass=regular-widthClass=compact">
@@ -175,6 +175,16 @@
                     <include reference="e7V-kk-HLm"/>
                 </mask>
                 <mask key="constraints">
+                    <include reference="GHs-F7-uVe"/>
+                    <include reference="xPD-el-DHV"/>
+                    <include reference="6PX-h5-6Or"/>
+                    <include reference="CYf-pS-exX"/>
+                    <include reference="YVC-IQ-QhR"/>
+                    <include reference="soK-oO-JXU"/>
+                    <include reference="tQc-tx-IxP"/>
+                    <include reference="UJQ-m8-Ihg"/>
+                    <include reference="V9d-On-fnR"/>
+                    <include reference="bhK-CD-gPx"/>
                     <include reference="B5b-eu-fRu"/>
                     <include reference="CC5-bA-klv"/>
                     <include reference="G12-eC-Tx0"/>
@@ -182,20 +192,10 @@
                     <include reference="elb-kW-B24"/>
                     <include reference="sud-Vf-EaU"/>
                     <include reference="yyN-1X-6BY"/>
-                    <include reference="GHs-F7-uVe"/>
-                    <include reference="xPD-el-DHV"/>
-                    <include reference="QvC-xP-KVm"/>
-                    <include reference="UiT-bb-Cus"/>
-                    <include reference="6PX-h5-6Or"/>
-                    <include reference="CYf-pS-exX"/>
-                    <include reference="YVC-IQ-QhR"/>
-                    <include reference="soK-oO-JXU"/>
-                    <include reference="tQc-tx-IxP"/>
                     <include reference="R1Y-8z-saO"/>
                     <include reference="Z7l-Lj-JSW"/>
-                    <include reference="UJQ-m8-Ihg"/>
-                    <include reference="V9d-On-fnR"/>
-                    <include reference="bhK-CD-gPx"/>
+                    <include reference="QvC-xP-KVm"/>
+                    <include reference="UiT-bb-Cus"/>
                 </mask>
             </variation>
             <point key="canvasLocation" x="351" y="266"/>

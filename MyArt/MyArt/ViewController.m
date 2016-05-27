@@ -43,10 +43,6 @@
 
 #pragma mark - baseView
 @property (weak, nonatomic) IBOutlet UIView *baseView;
-//@property (weak, nonatomic) IBOutlet NSLayoutConstraint *left;
-//@property (weak, nonatomic) IBOutlet NSLayoutConstraint *top;
-//@property (weak, nonatomic) IBOutlet NSLayoutConstraint *bottom;
-//@property (weak, nonatomic) IBOutlet NSLayoutConstraint *right;
 @property (weak, nonatomic) IBOutlet NSLayoutConstraint *heightA;
 @property (weak, nonatomic) IBOutlet NSLayoutConstraint *heightB;
 @property (weak, nonatomic) IBOutlet NSLayoutConstraint *heightC;
