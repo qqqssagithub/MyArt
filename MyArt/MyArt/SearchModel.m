@@ -17,7 +17,9 @@
     for (NSInteger index = 0; index < dataArray0.count; index ++) {
         SearchModel *model = [[SearchModel alloc] init];
         model.title = dataArray0[index][@"title"];
-        model.pic_small = dataArray1[index][@"pic_small"];
+        if (index <dataArray1.count) {
+            model.pic_small = dataArray1[index][@"pic_small"];
+        }
         model.song_id = dataArray0[index][@"song_id"];
         model.author = dataArray0[index][@"author"];
         [mainArray addObject:model];

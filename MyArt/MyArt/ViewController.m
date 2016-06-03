@@ -99,10 +99,10 @@
 @property (weak, nonatomic) IBOutlet UIView *menuView;                       //自定制tabBar
 @property (weak, nonatomic) IBOutlet UIView *containerView;                  //容器View,装VC用的
 @property (nonatomic) UIViewController *currentViewController;               //记录当前VC
-@property (weak, nonatomic) IBOutlet UIButton *recommended;                  //------
-@property (weak, nonatomic) IBOutlet UIButton *song;                         //自定制tabBar
-@property (weak, nonatomic) IBOutlet UIButton *list;                         //上的四个按钮
-@property (weak, nonatomic) IBOutlet UIButton *radio;                        //------
+@property (weak, nonatomic) IBOutlet UIButton *recommended;                  //|------------|
+@property (weak, nonatomic) IBOutlet UIButton *song;                         //|自定制tabBar |
+@property (weak, nonatomic) IBOutlet UIButton *list;                         //|上的四个按钮  |
+@property (weak, nonatomic) IBOutlet UIButton *radio;                        //|____________|
 
 
 #pragma mark - 主tableView

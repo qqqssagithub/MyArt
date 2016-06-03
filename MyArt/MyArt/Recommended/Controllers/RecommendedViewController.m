@@ -97,26 +97,24 @@
     [_topImageView sd_setImageWithURL:[self.dataSource lastObject][@"pic_w700"]];
     [UIView animateWithDuration:0.1 animations:^{
         _topImageView.alpha = 1.0;
-        
-        if ([[NSUserDefaults standardUserDefaults] boolForKey:@"topImageViewTempIsShow"] == NO) {
-            _topImageViewTemp = [[UIView alloc] initWithFrame:CGRectMake(0, 0, _topImageView.frame.size.width, _topImageView.frame.size.width)];
-            _topImageViewTemp.backgroundColor = [UIColor colorWithWhite:0.0 alpha:0.4];
-            [_topImageView addSubview:_topImageViewTemp];
-            UIImageView *imgV = [[UIImageView alloc] initWithFrame:CGRectMake(0, 0, 120, 120)];
-            imgV.image = [UIImage imageNamed:@"topImageViewTemp"];
-            imgV.center = _topImageViewTemp.center;
-            [_topImageViewTemp addSubview:imgV];
-            [[NSUserDefaults standardUserDefaults] setBool:YES forKey:@"topImageViewTempIsShow"];
-        }
-        
-        
-        
     } completion:^(BOOL finished) {
         UITapGestureRecognizer * tapGR=[[UITapGestureRecognizer alloc]initWithTarget:self action:@selector(tapGR:)];
         [_topImageView addGestureRecognizer:tapGR];
         _titleLabel.text = [self.dataSource lastObject][@"title"];
         _tagLabel.text = [self.dataSource lastObject][@"tag"];
         _descLabel.text = [self.dataSource lastObject][@"desc"];
+        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+            if ([[NSUserDefaults standardUserDefaults] boolForKey:@"topImageViewTempIsShow"] == NO) {
+                _topImageViewTemp = [[UIView alloc] initWithFrame:CGRectMake(0, 0, _topImageView.frame.size.width, _topImageView.frame.size.width)];
+                _topImageViewTemp.backgroundColor = [UIColor colorWithWhite:0.0 alpha:0.4];
+                [_topImageView addSubview:_topImageViewTemp];
+                UIImageView *imgV = [[UIImageView alloc] initWithFrame:CGRectMake(0, 0, 120, 120)];
+                imgV.image = [UIImage imageNamed:@"topImageViewTemp"];
+                imgV.center = _topImageViewTemp.center;
+                [_topImageViewTemp addSubview:imgV];
+                [[NSUserDefaults standardUserDefaults] setBool:YES forKey:@"topImageViewTempIsShow"];
+            }
+        });
     }];
 }
 

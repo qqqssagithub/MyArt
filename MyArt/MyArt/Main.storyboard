@@ -381,15 +381,9 @@
                                     </label>
                                     <progressView opaque="NO" contentMode="scaleToFill" verticalHuggingPriority="750" progress="0.5" translatesAutoresizingMaskIntoConstraints="NO" id="zJp-BJ-Zf0">
                                         <rect key="frame" x="0.0" y="-2" width="150" height="2"/>
-                                        <variation key="heightClass=regular-widthClass=compact" misplaced="YES">
-                                            <rect key="frame" x="58" y="453" width="212" height="2"/>
-                                        </variation>
                                     </progressView>
                                     <slider opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" value="0.5" minValue="0.0" maxValue="1" translatesAutoresizingMaskIntoConstraints="NO" id="L60-lc-F8k">
                                         <rect key="frame" x="0.0" y="-15" width="118" height="31"/>
-                                        <variation key="heightClass=regular-widthClass=compact" misplaced="YES">
-                                            <rect key="frame" x="56" y="438" width="216" height="31"/>
-                                        </variation>
                                         <connections>
                                             <action selector="audioSliderValue:" destination="BYZ-38-t0r" eventType="valueChanged" id="jeL-mA-qte"/>
                                         </connections>
@@ -623,8 +617,7 @@
                                                 <exclude reference="IY2-07-pHA"/>
                                             </mask>
                                         </variation>
-                                        <variation key="heightClass=regular-widthClass=compact" misplaced="YES">
-                                            <rect key="frame" x="0.0" y="476" width="328" height="1"/>
+                                        <variation key="heightClass=regular-widthClass=compact">
                                             <mask key="constraints">
                                                 <include reference="IY2-07-pHA"/>
                                             </mask>
@@ -633,9 +626,6 @@
                                     <view alpha="0.0" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="tA1-xb-9g1" userLabel="playBottomView">
                                         <rect key="frame" x="0.0" y="0.0" width="240" height="128"/>
                                         <color key="backgroundColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
-                                        <variation key="heightClass=regular-widthClass=compact" misplaced="YES">
-                                            <rect key="frame" x="0.0" y="477" width="328" height="91"/>
-                                        </variation>
                                     </view>
                                     <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="RW4-dm-Ir6" userLabel="Hide Button">
                                         <rect key="frame" x="-23" y="-15" width="46" height="30"/>
