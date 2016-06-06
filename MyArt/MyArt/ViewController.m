@@ -324,9 +324,11 @@ typedef NS_ENUM(NSInteger, CirculationMode) {
     if ([self.queuePlayer canInsertItem:self.playerItems[index] afterItem:nil]) {
         [self.playerItems[index] seekToTime:kCMTimeZero];
         [self.queuePlayer insertItem:self.playerItems[index] afterItem:nil];
+        if (self.isPlaying) {
+            [self.queuePlayer pause];
+            [self.queuePlayer play];
+        }
     }
-    [self.queuePlayer play];
-    
     
     CMTime duration = ((AVPlayerItem *)self.playerItems[index]).duration;
     CGFloat totalDuration = CMTimeGetSeconds(duration);
