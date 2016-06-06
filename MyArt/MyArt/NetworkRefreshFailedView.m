@@ -16,7 +16,7 @@
         self.backgroundColor = [UIColor whiteColor];
         UILabel *label = [[UILabel alloc] initWithFrame:CGRectMake(0, 0, SCREEN_WIDTH, 50)];
         label.text = @"网络不给力呀! >_<|||\n点击界面刷新";
-        label.textColor = [UIColor colorWithRed:0.16 green:0.72 blue:1.0 alpha:1.0];
+        label.textColor = DEFAULTCOLOR;
         label.center = self.center;
         label.textAlignment = 1;
         label.numberOfLines = 0;

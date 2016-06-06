@@ -8,6 +8,7 @@
 
 #import "AppDelegate.h"
 
+
 @interface AppDelegate ()
 
 @end
@@ -21,6 +22,7 @@
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
     [MagicalRecord setupCoreDataStackWithStoreNamed:@"SongDetail.sqlite"];
+    [IFlySpeechUtility createUtility:[NSString stringWithFormat:@"appid=%@", IflyMSCAppID]];
     return YES;
 }
 

@@ -7,6 +7,15 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		000C61841D02B4260060A50F /* libz.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 000C61831D02B4260060A50F /* libz.tbd */; };
+		000C61861D02B4430060A50F /* CoreTelephony.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 000C61851D02B4430060A50F /* CoreTelephony.framework */; };
+		000C618B1D02BA1F0060A50F /* libc++.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 000C618A1D02BA1F0060A50F /* libc++.tbd */; };
+		000C61A51D02BD0D0060A50F /* iflyMSC.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 000C61A41D02BD0D0060A50F /* iflyMSC.framework */; };
+		000C61A71D02BD3D0060A50F /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 000C61A61D02BD3D0060A50F /* UIKit.framework */; };
+		000C61A91D02BD700060A50F /* AudioToolbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 000C61A81D02BD700060A50F /* AudioToolbox.framework */; };
+		000C61AB1D02BD7A0060A50F /* AddressBook.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 000C61AA1D02BD7A0060A50F /* AddressBook.framework */; };
+		000C61C91D02C86F0060A50F /* UISearchBar+additional.m in Sources */ = {isa = PBXBuildFile; fileRef = 000C61C81D02C86F0060A50F /* UISearchBar+additional.m */; };
+		000C61CC1D02E16F0060A50F /* ISRDataHelper.m in Sources */ = {isa = PBXBuildFile; fileRef = 000C61CB1D02E16F0060A50F /* ISRDataHelper.m */; };
 		00214C131CF051B3009B2B7C /* UIImage+blur.m in Sources */ = {isa = PBXBuildFile; fileRef = 00214C121CF051B3009B2B7C /* UIImage+blur.m */; };
 		002ABC761CC1FA30004DC966 /* Reachability.m in Sources */ = {isa = PBXBuildFile; fileRef = 002ABC751CC1FA30004DC966 /* Reachability.m */; };
 		004BEE361CE1A49600E58F12 /* dy.jpg in Resources */ = {isa = PBXBuildFile; fileRef = 004BEE311CE1A49600E58F12 /* dy.jpg */; };
@@ -152,6 +161,17 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		000C61831D02B4260060A50F /* libz.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libz.tbd; path = usr/lib/libz.tbd; sourceTree = SDKROOT; };
+		000C61851D02B4430060A50F /* CoreTelephony.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreTelephony.framework; path = System/Library/Frameworks/CoreTelephony.framework; sourceTree = SDKROOT; };
+		000C618A1D02BA1F0060A50F /* libc++.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = "libc++.tbd"; path = "usr/lib/libc++.tbd"; sourceTree = SDKROOT; };
+		000C61A41D02BD0D0060A50F /* iflyMSC.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = iflyMSC.framework; sourceTree = "<group>"; };
+		000C61A61D02BD3D0060A50F /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
+		000C61A81D02BD700060A50F /* AudioToolbox.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AudioToolbox.framework; path = System/Library/Frameworks/AudioToolbox.framework; sourceTree = SDKROOT; };
+		000C61AA1D02BD7A0060A50F /* AddressBook.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AddressBook.framework; path = System/Library/Frameworks/AddressBook.framework; sourceTree = SDKROOT; };
+		000C61C71D02C86F0060A50F /* UISearchBar+additional.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UISearchBar+additional.h"; sourceTree = "<group>"; };
+		000C61C81D02C86F0060A50F /* UISearchBar+additional.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UISearchBar+additional.m"; sourceTree = "<group>"; };
+		000C61CA1D02E16F0060A50F /* ISRDataHelper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ISRDataHelper.h; sourceTree = "<group>"; };
+		000C61CB1D02E16F0060A50F /* ISRDataHelper.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ISRDataHelper.m; sourceTree = "<group>"; };
 		00214C111CF051B3009B2B7C /* UIImage+blur.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIImage+blur.h"; sourceTree = "<group>"; };
 		00214C121CF051B3009B2B7C /* UIImage+blur.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIImage+blur.m"; sourceTree = "<group>"; };
 		002ABC741CC1FA30004DC966 /* Reachability.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Reachability.h; sourceTree = "<group>"; };
@@ -385,6 +405,13 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				000C61AB1D02BD7A0060A50F /* AddressBook.framework in Frameworks */,
+				000C61A91D02BD700060A50F /* AudioToolbox.framework in Frameworks */,
+				000C61A71D02BD3D0060A50F /* UIKit.framework in Frameworks */,
+				000C618B1D02BA1F0060A50F /* libc++.tbd in Frameworks */,
+				000C61861D02B4430060A50F /* CoreTelephony.framework in Frameworks */,
+				000C61841D02B4260060A50F /* libz.tbd in Frameworks */,
+				000C61A51D02BD0D0060A50F /* iflyMSC.framework in Frameworks */,
 				DCA4269C6393F76541A39AC4 /* libPods.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -430,6 +457,8 @@
 				00F745C31CCF4F8E007D9AD5 /* NetworkRefreshFailedView.m */,
 				00214C111CF051B3009B2B7C /* UIImage+blur.h */,
 				00214C121CF051B3009B2B7C /* UIImage+blur.m */,
+				000C61C71D02C86F0060A50F /* UISearchBar+additional.h */,
+				000C61C81D02C86F0060A50F /* UISearchBar+additional.m */,
 			);
 			name = Public;
 			sourceTree = "<group>";
@@ -437,6 +466,13 @@
 		66E98DE733C5DD1A140B8555 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				000C61AA1D02BD7A0060A50F /* AddressBook.framework */,
+				000C61A81D02BD700060A50F /* AudioToolbox.framework */,
+				000C61A61D02BD3D0060A50F /* UIKit.framework */,
+				000C61A41D02BD0D0060A50F /* iflyMSC.framework */,
+				000C618A1D02BA1F0060A50F /* libc++.tbd */,
+				000C61851D02B4430060A50F /* CoreTelephony.framework */,
+				000C61831D02B4260060A50F /* libz.tbd */,
 				EF3A6AE48C9B3BEA77A081F8 /* libPods.a */,
 			);
 			name = Frameworks;
@@ -950,6 +986,8 @@
 		A6C7951F1C2A366D008631AE /* Controller */ = {
 			isa = PBXGroup;
 			children = (
+				000C61CA1D02E16F0060A50F /* ISRDataHelper.h */,
+				000C61CB1D02E16F0060A50F /* ISRDataHelper.m */,
 				A6C794A21C2A2FE5008631AE /* ViewController.h */,
 				A6C794A31C2A2FE5008631AE /* ViewController.m */,
 				A6C794641C2A2FE5008631AE /* Main.storyboard */,
@@ -1176,6 +1214,7 @@
 				A6C795021C2A2FE5008631AE /* SongsModel.m in Sources */,
 				A6C794D41C2A2FE5008631AE /* JHRefreshAniBaseView.m in Sources */,
 				A6C794CA1C2A2FE5008631AE /* KVNProgress.m in Sources */,
+				000C61CC1D02E16F0060A50F /* ISRDataHelper.m in Sources */,
 				004BEEE21CE5597400E58F12 /* ListModel.m in Sources */,
 				A6C795061C2A2FE5008631AE /* ViewController.m in Sources */,
 				A69CBC0C1C2A5EF40076A22D /* MagicalRecord.m in Sources */,
@@ -1209,6 +1248,7 @@
 				A6C794D31C2A2FE5008631AE /* JHRefreshAmazingAniView.m in Sources */,
 				002ABC761CC1FA30004DC966 /* Reachability.m in Sources */,
 				A69CBBF61C2A5EF40076A22D /* NSObject+MagicalDataImport.m in Sources */,
+				000C61C91D02C86F0060A50F /* UISearchBar+additional.m in Sources */,
 				A6C794FF1C2A2FE5008631AE /* SearchModel.m in Sources */,
 				A69CBBF81C2A5EF40076A22D /* NSString+MagicalDataImport.m in Sources */,
 				A69CBBFE1C2A5EF40076A22D /* NSManagedObjectContext+MagicalChainSave.m in Sources */,
@@ -1290,7 +1330,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 7.1;
+				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				MTL_ENABLE_DEBUG_INFO = YES;
 				ONLY_ACTIVE_ARCH = YES;
 				PROVISIONING_PROFILE = "4d3c7149-b8cc-4fc8-a68f-538f20a5b681";
@@ -1330,7 +1370,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 7.1;
+				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				PROVISIONING_PROFILE = "4d3c7149-b8cc-4fc8-a68f-538f20a5b681";
 				SDKROOT = iphoneos;
@@ -1343,10 +1383,17 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 67E08E064DF4BE44B79531FB /* Pods.debug.xcconfig */;
 			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD)";
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				ENABLE_BITCODE = NO;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(SRCROOT)/MyArt",
+					"$(PROJECT_DIR)/MyArt",
+					"$(PROJECT_DIR)",
+				);
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = MyArt/MyMusicTest.pch;
 				INFOPLIST_FILE = "$(SRCROOT)/MyArt/Info.plist";
@@ -1366,10 +1413,17 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 984655C1CA8E3B48AD14D40D /* Pods.release.xcconfig */;
 			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD)";
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				ENABLE_BITCODE = NO;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(SRCROOT)/MyArt",
+					"$(PROJECT_DIR)/MyArt",
+					"$(PROJECT_DIR)",
+				);
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = MyArt/MyMusicTest.pch;
 				INFOPLIST_FILE = "$(SRCROOT)/MyArt/Info.plist";

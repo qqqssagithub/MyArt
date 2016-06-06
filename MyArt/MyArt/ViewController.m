@@ -19,13 +19,19 @@
 #import "SongDetail.h"
 #import "MostColor.h"
 #import "UIImage+blur.h"
+#import "ISRDataHelper.h"
 
 //Endless loud music
 
-@interface ViewController () <UITableViewDataSource, UITableViewDelegate, UISearchBarDelegate>
+@interface ViewController () <UITableViewDataSource, UITableViewDelegate, UISearchBarDelegate, IFlyRecognizerViewDelegate>
+{
+    IFlyRecognizerView *_iflyRecognizerView;                                 //语音搜索界面
+    BOOL _isYuYinSearch;                                                     //开始语音搜索
+    BOOL _playPause;                                                         //播放暂停
+}
 
 #pragma mark - 收藏
-@property (weak, nonatomic) IBOutlet UIButton *mine;                         //打开收藏的按钮(title:最爱);
+@property (weak, nonatomic) IBOutlet UIButton *mine;                         //打开收藏的按钮;
 @property (nonatomic) NSArray *SongArray;                                    //收藏列表数据数组
 @property (nonatomic) BOOL IS_LIKE;                                          //记录开始播放收藏的歌曲
 @property (nonatomic) BOOL IS_LIKEOPEN;                                      //收藏界面是否打开
@@ -145,12 +151,12 @@ typedef NS_ENUM(NSInteger, CirculationMode) {
 #pragma mark - 预设播放控制View
 - (void)viewDidAppear:(BOOL)animated{
     [super viewDidAppear:animated];
-
+    
     self.cycleMode = CirculationModeIsCycle;
     [_playButtonView.cycleButton setImage:[UIImage imageNamed:@"xunhuan1"] forState:UIControlStateNormal];
     
-    self.baseView.backgroundColor = [UIColor colorWithRed:0.16 green:0.72 blue:1.0 alpha:1.0];
-    self.menuView.backgroundColor = [UIColor colorWithRed:0.16 green:0.72 blue:1.0 alpha:1.0];
+    self.baseView.backgroundColor = DEFAULTCOLOR;
+    self.menuView.backgroundColor = DEFAULTCOLOR;
     
     
     self.cancelButtonWidth.constant = SCREEN_WIDTH / 8;
@@ -350,6 +356,9 @@ typedef NS_ENUM(NSInteger, CirculationMode) {
     //初始化播放序列
     [self customPlayer];
     
+    //初始化语音识别控件
+    [self customYuYin];
+
     //开启后台模式
     [[AVAudioSession sharedInstance] setCategory:AVAudioSessionCategoryPlayback error:nil];
     [[AVAudioSession sharedInstance] setActive:YES error:nil];
@@ -378,6 +387,14 @@ typedef NS_ENUM(NSInteger, CirculationMode) {
     
     //监听耳机的拨出
      [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(outputDeviceChanged:) name:AVAudioSessionRouteChangeNotification object:[AVAudioSession sharedInstance]];
+}
+
+- (void)customYuYin {
+    _iflyRecognizerView = [[IFlyRecognizerView alloc] initWithCenter:self.view.center];
+    _iflyRecognizerView.delegate = self;
+    [_iflyRecognizerView setParameter: @"iat" forKey:[IFlySpeechConstant IFLY_DOMAIN]];
+    //asr_audio_path保存录音文件名，如不再需要，设置value为nil表示取消，默认目录是documents
+    [_iflyRecognizerView setParameter:nil forKey:[IFlySpeechConstant ASR_AUDIO_PATH]];
 }
 
 - (void)outputDeviceChanged:(NSNotification *)aNotification {
@@ -675,7 +692,7 @@ typedef NS_ENUM(NSInteger, CirculationMode) {
     self.progressView.trackTintColor=[UIColor grayColor];
     self.progressView.progress = 0.0;
     
-    self.audioSlider.minimumTrackTintColor = [UIColor colorWithRed:0.16 green:0.72 blue:1.0 alpha:1.0];
+    self.audioSlider.minimumTrackTintColor = DEFAULTCOLOR;
     self.audioSlider.maximumTrackTintColor = [UIColor clearColor];
     self.audioSlider.value = 0.0;//初始化播放进度条
 }
@@ -1460,11 +1477,25 @@ typedef NS_ENUM(NSInteger, CirculationMode) {
 
 - (UISearchBar *)searchBar{
     _searchBar = [[UISearchBar alloc] initWithFrame:CGRectMake(SCREEN_WIDTH, 20, SCREEN_WIDTH, 44)];
+    UIBarButtonItem *yuYinBtnItem = [[UIBarButtonItem alloc] initWithTitle:@"语音搜索" style:UIBarButtonItemStylePlain target:self action:@selector(openYuYin:)];
+    [yuYinBtnItem setTintColor:DEFAULTCOLOR];
+    UIBarButtonItem *spaceBtnItem= [[ UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace target:nil action:nil];
+    UIBarButtonItem *hideBtnItem = [[UIBarButtonItem alloc] initWithTitle:@"隐藏" style:UIBarButtonItemStylePlain target:self action:@selector(onKeyBoardDown:)];
+    [hideBtnItem setTintColor:DEFAULTCOLOR];
+    UIToolbar * toolbar = [[ UIToolbar alloc]initWithFrame:CGRectMake(0, 0, SCREEN_WIDTH, 44)];
+    toolbar.barStyle = UIBarStyleDefault;
+    NSArray * array = [NSArray arrayWithObjects:yuYinBtnItem, spaceBtnItem, hideBtnItem, nil];
+    [toolbar setItems:array];
+    _searchBar.inputAccessoryView = toolbar;
+  
     _searchDate = [[NSMutableArray alloc] init];
     _searchBar.delegate=self;
     _searchBar.placeholder = @"请输入搜索内容";
     [_searchBar becomeFirstResponder];
     _searchBar.showsCancelButton = YES;
+    //设置取消搜索按钮的默认颜色
+    self.cancelButton.tintColor = DEFAULTCOLOR;
+    _searchBar.tintColor = DEFAULTCOLOR;
     self.IS_SEARCHING = YES;
     
     if (_tableView != nil) {
@@ -1482,6 +1513,72 @@ typedef NS_ENUM(NSInteger, CirculationMode) {
         _tableView.frame = CGRectMake(0, 64, SCREEN_WIDTH, SCREEN_HEIGHT - 64);
     }];
     return _searchBar;
+}
+
+- (void)openYuYin:(id)sender {
+    if (self.isPlaying) {
+        [self.queuePlayer pause];
+        self.isPlaying = NO;
+        _playPause = YES;
+    }
+    [_searchBar resignFirstResponder];
+    _searchBar.text = @"请说出搜索内容";
+    //启动识别服务
+    [self.view bringSubviewToFront:_iflyRecognizerView];
+    [_iflyRecognizerView start];
+    _isYuYinSearch = YES;
+    
+    UITapGestureRecognizer *yuYintap=[[UITapGestureRecognizer alloc]initWithTarget:self action:@selector(yuYintapGR:)];
+    [_iflyRecognizerView addGestureRecognizer:yuYintap];
+}
+
+-(void)yuYintapGR:(UITapGestureRecognizer *)tapGR{
+    if (_isYuYinSearch) {
+        _searchBar.text = @"";
+        [_iflyRecognizerView cancel];
+        [_iflyRecognizerView removeFromSuperview];
+        _isYuYinSearch = NO;
+        if (_playPause) {
+            [self.queuePlayer play];
+            self.isPlaying = YES;
+        }
+    }
+}
+
+/*识别结果返回代理
+ @param resultArray 识别结果
+ @ param isLast 表示是否最后一次结果
+ */
+- (void)onResult:(NSArray *)resultArray isLast:(BOOL)isLast {
+    if (_isYuYinSearch) {
+        NSDictionary *dic = resultArray[0];
+        NSMutableString *resultString = [[NSMutableString alloc] init];
+        for (NSString *key in dic) {
+            [resultString appendFormat:@"%@",key];
+        }
+        _searchBar.text = [ISRDataHelper stringFromJson:resultString];
+        _isYuYinSearch = NO;
+        [self searchBar:_searchBar textDidChange:_searchBar.text];
+        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1.2 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+            [_searchBar becomeFirstResponder];
+        });
+    }
+}
+
+/*识别会话错误返回代理
+ @ param  error 错误码
+ */
+- (void)onError:(IFlySpeechError *)error {
+    //[_popUpView showText:@"识别结束"];
+    if (_playPause) {
+        [self.queuePlayer play];
+        self.isPlaying = YES;
+    }
+    NSLog(@"语音搜索结束:%d", [error errorCode]);
+}
+
+- (void)onKeyBoardDown:(id)sender {
+    [_searchBar resignFirstResponder];
 }
 
 -(void)searchBar:(UISearchBar *)searchBar textDidChange:(NSString *)searchText{

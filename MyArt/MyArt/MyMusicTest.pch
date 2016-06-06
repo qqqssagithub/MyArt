@@ -36,12 +36,16 @@
 #import "Reachability.h"
 #import "NetworkRefreshFailedView.h"
 
+#import <iflyMSC/IFlyMSC.h>
+
+
 //屏幕尺寸定义
 #define SCREEN_WIDTH  [UIScreen mainScreen].bounds.size.width
 #define SCREEN_HEIGHT [UIScreen mainScreen].bounds.size.height
 #define SCREEN_SIZE   [UIScreen mainScreen].bounds.size
 #define SCREEN_RECT   [UIScreen mainScreen].bounds
 
+#define DEFAULTCOLOR [UIColor colorWithRed:0.16 green:0.72 blue:1.0 alpha:1.0]
 
 #define SONG_URL @"http://tingapi.ting.baidu.com/v1/restserver/ting?method=baidu.ting.song.getInfos&ts=1448284306&songid=%@%@"
 #define SONG_URL_X @"&nw=2&l2p=2897.5&lpb=193088&ext=MP3&format=json&from=ios&usup=1&lebo=0&aac=0&ucf=4&vid=&res=2&e=NOY9TnalK3sTHsDcDyNRBHqApG4ORk4vmKD8QrlAJ8Q%3D&version=5.5.1&from=ios&channel=appstore"
@@ -50,6 +54,7 @@
 
 
 #define VERSION @"5.6.0"
+#define IflyMSCAppID @"57524ce6"
 
 // Include any system framework and library headers here that should be included in all compilation units.
 // You will also need to set the Prefix Header build setting of one or more of your targets to reference this file.

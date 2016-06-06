@@ -50,7 +50,9 @@
     [super viewDidLoad];
     self.songList = [NSMutableArray array];
     [self.activityView startAnimating];
+    self.activityView.color = DEFAULTCOLOR;
     [self.bigActivityView startAnimating];
+    self.bigActivityView.color = DEFAULTCOLOR;
     self.activityView.hidesWhenStopped = YES;
     self.bigActivityView.hidesWhenStopped = YES;
     self.dataSource = [NSMutableArray array];
